@@ -2,7 +2,41 @@
 
 import { useState } from "react";
 import type { MatrixDaten, ZirkularZelle } from "@/lib/digitaleKompetenzen";
-import { themenKurzNamen } from "@/lib/digitaleKompetenzen";
+import {
+  themenKurzNamen,
+  matrixSprachmodi,
+  matrixKompetenzen,
+  matrixAspekte,
+} from "@/lib/digitaleKompetenzen";
+
+const dimEmojis = {
+  sprachmodi: "💬",
+  schluesselkompetenzen: "🎯",
+  "gesellschaftliche-inhalte": "🌐",
+};
+
+const dimLabels = {
+  sprachmodi: "Sprachmodi",
+  schluesselkompetenzen: "Schlüsselkompetenzen",
+  "gesellschaftliche-inhalte": "Aspekte",
+};
+
+// Cross-Reference: Welche Items aus den anderen Dimensionen sind in diesem Thema aktiv?
+function getCrossReferences(themaIdx: number, currentDim: string) {
+  const others: { dim: string; items: { name: string; r: string; istKI: boolean }[] }[] = [];
+  for (const m of [matrixSprachmodi, matrixKompetenzen, matrixAspekte]) {
+    if (m.dimension === currentDim) continue;
+    const items = m.items
+      .filter((i) => i.zellen[themaIdx]?.r !== null)
+      .map((i) => ({
+        name: i.name,
+        r: i.zellen[themaIdx].r as string,
+        istKI: i.zellen[themaIdx].istKI === true || i.istKI,
+      }));
+    if (items.length > 0) others.push({ dim: m.dimension, items });
+  }
+  return others;
+}
 
 interface Props {
   matrix: MatrixDaten;
@@ -159,16 +193,16 @@ export default function KompetenzMatrix({ matrix }: Props) {
             ))}
           </div>
 
-          {/* Hover-Detail */}
+          {/* Hover-Detail mit Cross-References */}
           {hover && hover.zelle.r && (
             <div
               className={`mt-4 rounded-xl border ${
                 hover.zelle.istKI
                   ? "border-fuchsia-400/50 bg-fuchsia-500/10"
                   : `${c.border} bg-black/30`
-              } p-3 animate-fade-in`}
+              } p-4 animate-fade-in`}
             >
-              <div className="flex items-baseline gap-2 mb-1">
+              <div className="flex items-baseline gap-2 mb-2">
                 <span
                   className={`text-[10px] font-bold uppercase tracking-wide ${
                     hover.zelle.istKI ? "text-fuchsia-300" : c.accent
@@ -191,10 +225,51 @@ export default function KompetenzMatrix({ matrix }: Props) {
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-zinc-200 mb-1">
-                <span className="text-zinc-400">{matrix.items[hover.row].name}:</span>{" "}
+              <p className="text-[12px] text-zinc-100 mb-3">
+                <span className={`font-medium ${c.accent}`}>{matrix.items[hover.row].name}:</span>{" "}
                 {hover.zelle.detail}
               </p>
+
+              {/* Cross-References */}
+              {(() => {
+                const refs = getCrossReferences(hover.col, matrix.dimension);
+                if (refs.length === 0) return null;
+                return (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-[9px] font-bold uppercase tracking-wide text-zinc-500 mb-2">
+                      Gleichzeitig in T{hover.col + 1} gefördert:
+                    </p>
+                    <div className="space-y-2">
+                      {refs.map((ref) => (
+                        <div key={ref.dim}>
+                          <span className="text-[10px] text-zinc-400 mr-2">
+                            {dimEmojis[ref.dim as keyof typeof dimEmojis]} {dimLabels[ref.dim as keyof typeof dimLabels]}:
+                          </span>
+                          <span className="inline-flex flex-wrap gap-1">
+                            {ref.items.map((item, j) => (
+                              <span
+                                key={j}
+                                className={`rounded px-1.5 py-0.5 text-[10px] ${
+                                  item.istKI
+                                    ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-400/40"
+                                    : ref.dim === "sprachmodi"
+                                    ? "bg-amber-500/20 text-amber-200 border border-amber-400/30"
+                                    : ref.dim === "schluesselkompetenzen"
+                                    ? "bg-blue-500/20 text-blue-200 border border-blue-400/30"
+                                    : "bg-emerald-500/20 text-emerald-200 border border-emerald-400/30"
+                                }`}
+                              >
+                                {item.name}
+                                <span className="ml-1 opacity-60">{item.r}</span>
+                              </span>
+                            ))}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
