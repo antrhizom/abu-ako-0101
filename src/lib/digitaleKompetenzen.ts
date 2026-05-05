@@ -21,9 +21,9 @@ export const dimensionen: KompetenzDimension[] = [
   {
     id: "sprachmodi",
     titel: "Sprachmodi",
-    untertitel: "Wie kommunizierst du digital?",
+    untertitel: "Wie kommunizierst du?",
     beschreibung:
-      "Zwei der neun Sprachmodi sind explizit digital ausgerichtet. Sie verlangen, dass du dich in digitalen Kommunikationsräumen sicher bewegst.",
+      "Alle 9 Sprachmodi werden im SLP gefordert. Sechs davon sind digital geprägt — drei davon erfordern aktive KI-Kompetenzen.",
     farbe: "amber",
     emoji: "💬",
     anforderungen: [
@@ -128,14 +128,21 @@ export interface ThemaDigital {
 }
 
 // === MATRIX-DATEN ===
-// Pro Item: Wo wird es eingeführt (R1) bzw. wiederholt (R2/R3) und ob digital gefragt
+// Pro Item: Wo wird es eingeführt (R1) bzw. wiederholt (R2/R3) und ob digital/KI gefragt
 export type RKennung = "R1" | "R2" | "R3" | null;
+
+export interface ZirkularZelle {
+  r: RKennung;
+  detail?: string; // Was wird in diesem Thema konkret gefordert?
+  istKI?: boolean; // Speziell KI-relevant in diesem Thema?
+}
 
 export interface MatrixItem {
   name: string;
-  istDigital: boolean; // Ob dieser Bereich digitale Kompetenzen einfordert
-  digitalNote?: string; // Kurzhinweis warum digital
-  zirkular: RKennung[]; // Index 0-7 für Themen 1-8
+  istDigital: boolean; // Ob dieser Bereich allgemein digitale Kompetenzen einfordert
+  istKI: boolean; // Ob KI-Kompetenzen explizit gefragt sind
+  digitalNote?: string;
+  zellen: ZirkularZelle[]; // Index 0-7 für Themen 1-8
 }
 
 export interface MatrixDaten {
@@ -156,7 +163,10 @@ export const themenKurzNamen = [
   "Kultur",
 ];
 
-// Sprachmodi-Matrix (9 Sprachmodi × 8 Themen)
+// Hilfsfunktion: leere Zelle
+const e = (): ZirkularZelle => ({ r: null });
+
+// Sprachmodi-Matrix (9 × 8)
 export const matrixSprachmodi: MatrixDaten = {
   dimension: "sprachmodi",
   farbe: "amber",
@@ -164,53 +174,117 @@ export const matrixSprachmodi: MatrixDaten = {
     {
       name: "Rezeption mündlich",
       istDigital: false,
-      zirkular: [null, null, "R1", null, "R2", null, null, null],
+      istKI: false,
+      zellen: [
+        e(), e(),
+        { r: "R1", detail: "Gespräche zu Gesundheit verstehen" },
+        e(),
+        { r: "R2", detail: "Politische Beiträge und Diskussionen verstehen" },
+        e(), e(), e(),
+      ],
     },
     {
       name: "Rezeption audiovisuell",
       istDigital: true,
-      digitalNote: "Videos, Podcasts, KI-generierte Medien",
-      zirkular: [null, "R1", null, "R2", null, null, "R3", null],
+      istKI: true,
+      digitalNote: "Videos, Podcasts, KI-generierte Medien — Künstliche von echten Inhalten unterscheiden",
+      zellen: [
+        e(),
+        { r: "R1", detail: "Audiovisuelle Werbung verstehen", istKI: false },
+        e(),
+        { r: "R2", detail: "KI-Inhalte erkennen, Videos kritisch prüfen", istKI: true },
+        e(), e(),
+        { r: "R3", detail: "Trends in der Arbeitswelt verstehen" },
+        e(),
+      ],
     },
     {
       name: "Rezeption schriftlich und bildlich",
       istDigital: true,
-      digitalNote: "Digitale Texte, Websites, Infografiken",
-      zirkular: ["R1", null, null, "R2", null, null, null, "R3"],
+      istKI: false,
+      digitalNote: "Digitale Texte, Websites, Infografiken, Recherche",
+      zellen: [
+        { r: "R1", detail: "Lehrvertrag, Berufsbildungs-Infos lesen" },
+        e(), e(),
+        { r: "R2", detail: "Recherchefunktionen (inkl. KI), Quellenarchive nutzen", istKI: true },
+        e(), e(), e(),
+        { r: "R3", detail: "Künstlerische digitale Texte einordnen" },
+      ],
     },
     {
       name: "Produktion mündlich",
       istDigital: false,
-      zirkular: [null, null, null, null, "R1", "R2", null, null],
+      istKI: false,
+      zellen: [
+        e(), e(), e(), e(),
+        { r: "R1", detail: "Eigene Meinung mündlich vertreten" },
+        { r: "R2", detail: "Reklamationsgespräche, Verhandlungen" },
+        e(), e(),
+      ],
     },
     {
       name: "Produktion schriftlich und bildlich",
       istDigital: true,
-      digitalNote: "Digitale Dokumente, Bewerbungen, Inhalte",
-      zirkular: [null, null, "R1", null, "R2", null, "R3", null],
+      istKI: true,
+      digitalNote: "Digitale Dokumente, Bewerbungen, KI-unterstützt verfassen",
+      zellen: [
+        e(), e(),
+        { r: "R1", detail: "Digitale Notizen, Übersichten erstellen" },
+        e(),
+        { r: "R2", detail: "Politische Texte, Kommentare verfassen" },
+        e(),
+        { r: "R3", detail: "Bewerbungen mit KI-Unterstützung", istKI: true },
+        e(),
+      ],
     },
     {
       name: "Produktion multimedial",
       istDigital: true,
-      digitalNote: "Videos, Präsentationen, KI-Bilder",
-      zirkular: [null, null, null, null, "R1", null, null, "R2"],
+      istKI: true,
+      digitalNote: "Videos, Präsentationen, KI-Bilder erstellen",
+      zellen: [
+        e(), e(), e(), e(),
+        { r: "R1", detail: "Politische Inhalte multimedial aufbereiten", istKI: true },
+        e(), e(),
+        { r: "R2", detail: "Künstlerische digitale Produkte erstellen", istKI: true },
+      ],
     },
     {
       name: "Interaktion und Kollaboration mündlich",
       istDigital: false,
-      zirkular: ["R1", null, null, null, "R2", null, null, null],
+      istKI: false,
+      zellen: [
+        { r: "R1", detail: "Gespräche im Betrieb, Konfliktlösung" },
+        e(), e(), e(),
+        { r: "R2", detail: "Diskussionen, Aushandlungsprozesse" },
+        e(), e(), e(),
+      ],
     },
     {
       name: "Interaktion und Kollaboration schriftlich",
       istDigital: true,
-      digitalNote: "E-Mail, Chat, schriftliche Beschwerden",
-      zirkular: [null, null, null, "R1", null, "R2", "R3", null],
+      istKI: false,
+      digitalNote: "E-Mail, Chat, schriftliche Reklamation",
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "Digital schriftlich kommunizieren (E-Mail, Chat)" },
+        e(),
+        { r: "R2", detail: "Schriftliche Reklamation, Beschwerde" },
+        { r: "R3", detail: "Bewerbungsschreiben digital" },
+        e(),
+      ],
     },
     {
       name: "Interaktion und Kollaboration digital",
       istDigital: true,
+      istKI: true,
       digitalNote: "Videokonferenz, KI-Tools, digitale Teamarbeit",
-      zirkular: ["R1", null, null, "R2", null, null, null, null],
+      zellen: [
+        { r: "R1", detail: "Videokonferenz, KI-Tools im Team", istKI: true },
+        e(), e(),
+        { r: "R2", detail: "KI-Interaktion vertieft, digitale Projekte", istKI: true },
+        e(), e(), e(), e(),
+      ],
     },
   ],
 };
@@ -223,70 +297,148 @@ export const matrixKompetenzen: MatrixDaten = {
     {
       name: "Ziele setzen und anpassen",
       istDigital: true,
-      digitalNote: "Digitale Planung, KI-gestützte Reflexion",
-      zirkular: ["R1", null, null, null, null, null, "R2", null],
+      istKI: false,
+      digitalNote: "Digitale Planung, Reflexion mit Tools",
+      zellen: [
+        { r: "R1", detail: "Lernziele in der Ausbildung digital festhalten" },
+        e(), e(), e(), e(), e(),
+        { r: "R2", detail: "Berufliche Ziele anpassen, Bewerbungen planen" },
+        e(),
+      ],
     },
     {
       name: "Verständnis fördern",
       istDigital: false,
-      zirkular: ["R1", null, "R2", null, null, "R3", null, null],
+      istKI: false,
+      zellen: [
+        { r: "R1", detail: "System der Berufsbildung verstehen" },
+        e(),
+        { r: "R2", detail: "Sicherheits- und Gesundheitsthemen verstehen" },
+        e(), e(),
+        { r: "R3", detail: "Vertragsrecht verstehen" },
+        e(), e(),
+      ],
     },
     {
       name: "Anpassung",
       istDigital: true,
-      digitalNote: "Neue Tools, KI, sich verändernde Plattformen",
-      zirkular: [null, null, null, "R1", null, null, "R2", null],
+      istKI: true,
+      digitalNote: "Neue Tools, KI-Anwendungen, sich verändernde Plattformen",
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "Sich in digitalen Räumen orientieren", istKI: true },
+        e(), e(),
+        { r: "R2", detail: "An sich verändernde Arbeitswelt anpassen", istKI: true },
+        e(),
+      ],
     },
     {
       name: "Nachhaltigkeit",
       istDigital: false,
-      zirkular: [null, "R1", null, null, null, null, null, "R2"],
+      istKI: false,
+      zellen: [
+        e(),
+        { r: "R1", detail: "Nachhaltig konsumieren" },
+        e(), e(), e(), e(), e(),
+        { r: "R2", detail: "Kulturelle Vielfalt wertschätzen" },
+      ],
     },
     {
       name: "Innovation und Problemlösung",
       istDigital: true,
-      digitalNote: "Digitale Werkzeuge zum Lösen von Aufgaben",
-      zirkular: [null, null, null, "R1", null, null, "R2", null],
+      istKI: true,
+      digitalNote: "Digitale Werkzeuge zum Lösen, KI-gestützte Recherche",
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "Digitale Werkzeuge gezielt einsetzen", istKI: true },
+        e(), e(),
+        { r: "R2", detail: "KI-Unterstützung für Bewerbung, Aufgaben", istKI: true },
+        e(),
+      ],
     },
     {
       name: "Quellen unterscheiden",
       istDigital: true,
+      istKI: true,
       digitalNote: "KI-Inhalte, Fake News, Filterblasen erkennen",
-      zirkular: [null, null, null, "R1", "R2", null, null, null],
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "Verlässliche Quellen finden, KI-Inhalte erkennen", istKI: true },
+        { r: "R2", detail: "Politische Quellen kritisch prüfen" },
+        e(), e(), e(),
+      ],
     },
     {
       name: "Standpunkte begründen",
       istDigital: false,
-      zirkular: [null, null, null, null, "R1", "R2", null, null],
+      istKI: false,
+      zellen: [
+        e(), e(), e(), e(),
+        { r: "R1", detail: "Eigene Meinung begründet vertreten" },
+        { r: "R2", detail: "In Konflikten Standpunkt vertreten" },
+        e(), e(),
+      ],
     },
     {
       name: "Werthaltungen reflektieren",
       istDigital: true,
-      digitalNote: "Eigene Mediennutzung, Datenschutz hinterfragen",
-      zirkular: [null, "R1", null, "R2", null, null, null, "R3"],
+      istKI: false,
+      digitalNote: "Mediennutzung, Datenschutz hinterfragen",
+      zellen: [
+        e(),
+        { r: "R1", detail: "Eigenes Konsumverhalten reflektieren" },
+        e(),
+        { r: "R2", detail: "Mediennutzung & digitale Spuren reflektieren" },
+        e(), e(), e(),
+        { r: "R3", detail: "Künstlerische Werthaltungen reflektieren" },
+      ],
     },
     {
       name: "Teamarbeit",
       istDigital: true,
+      istKI: false,
       digitalNote: "Digitale Zusammenarbeit, kollaborative Tools",
-      zirkular: ["R1", null, null, null, null, null, "R2", null],
+      zellen: [
+        { r: "R1", detail: "Im Team arbeiten, auch digital" },
+        e(), e(), e(), e(), e(),
+        { r: "R2", detail: "Digitale Projekte im Team durchführen" },
+        e(),
+      ],
     },
     {
       name: "Partizipation",
       istDigital: true,
+      istKI: false,
       digitalNote: "Digitale Teilhabe, Online-Beteiligung",
-      zirkular: [null, null, null, null, "R1", null, null, "R2"],
+      zellen: [
+        e(), e(), e(), e(),
+        { r: "R1", detail: "An politischen Prozessen teilhaben (auch digital)" },
+        e(), e(),
+        { r: "R2", detail: "Kulturelle Teilhabe, eigene Beiträge" },
+      ],
     },
     {
       name: "Lebensphasen planen",
       istDigital: false,
-      zirkular: ["R1", null, null, null, null, null, "R2", null],
+      istKI: false,
+      zellen: [
+        { r: "R1", detail: "Ausbildungs-Lebensphase planen" },
+        e(), e(), e(), e(), e(),
+        { r: "R2", detail: "Berufliche Zukunft planen" },
+        e(),
+      ],
     },
     {
       name: "Mehrdeutigkeit",
       istDigital: true,
-      digitalNote: "Mit KI-Unsicherheit umgehen",
-      zirkular: [null, null, null, "R1", "R2", null, null, null],
+      istKI: true,
+      digitalNote: "Mit KI-Unsicherheit, mehrdeutigen Inhalten umgehen",
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "KI-Inhalte sind mehrdeutig — damit umgehen", istKI: true },
+        { r: "R2", detail: "Politische Mehrdeutigkeit aushalten" },
+        e(), e(), e(),
+      ],
     },
   ],
 };
@@ -299,48 +451,97 @@ export const matrixAspekte: MatrixDaten = {
     {
       name: "Ethik",
       istDigital: true,
+      istKI: true,
       digitalNote: "Digitalethik, KI-Verantwortung",
-      zirkular: [null, "R1", null, "R2", null, null, null, "R3"],
+      zellen: [
+        e(),
+        { r: "R1", detail: "Konsumethik, faire Entscheidungen" },
+        e(),
+        { r: "R2", detail: "Ethik im digitalen Raum, KI-Verantwortung", istKI: true },
+        e(), e(), e(),
+        { r: "R3", detail: "Kulturelle Ethik" },
+      ],
     },
     {
       name: "Identität und Sozialisation",
       istDigital: true,
+      istKI: false,
       digitalNote: "Digitale Identität, Online-Rollen",
-      zirkular: ["R1", null, null, "R2", null, null, "R3", null],
+      zellen: [
+        { r: "R1", detail: "Rolle in der Arbeitswelt finden" },
+        e(), e(),
+        { r: "R2", detail: "Digitale Identität & Online-Rollen reflektieren" },
+        e(), e(),
+        { r: "R3", detail: "Berufliche Identität entwickeln" },
+        e(),
+      ],
     },
     {
       name: "Kultur",
       istDigital: true,
-      digitalNote: "Digitale Kunst, Memes, Online-Kultur",
-      zirkular: [null, null, null, null, null, null, null, "R1"],
+      istKI: false,
+      digitalNote: "Digitale Kunst, Online-Kultur, Memes",
+      zellen: [
+        e(), e(), e(), e(), e(), e(), e(),
+        { r: "R1", detail: "Künstlerische Ausdrucksformen, auch digital" },
+      ],
     },
     {
       name: "Ökologie",
       istDigital: false,
-      zirkular: [null, "R1", null, null, null, null, null, null],
+      istKI: false,
+      zellen: [
+        e(),
+        { r: "R1", detail: "Nachhaltiger Konsum, Umweltbelastung" },
+        e(), e(), e(), e(), e(), e(),
+      ],
     },
     {
       name: "Politik",
       istDigital: true,
-      digitalNote: "Digitale Demokratie, politische Meinungsbildung online",
-      zirkular: [null, null, null, null, "R1", null, null, null],
+      istKI: false,
+      digitalNote: "Digitale Demokratie, Online-Meinungsbildung",
+      zellen: [
+        e(), e(), e(), e(),
+        { r: "R1", detail: "Politische Beteiligung, auch digital" },
+        e(), e(), e(),
+      ],
     },
     {
       name: "Recht",
       istDigital: true,
+      istKI: false,
       digitalNote: "Datenschutz, Urheberrecht, digitale Verträge",
-      zirkular: [null, null, null, null, null, "R1", null, null],
+      zellen: [
+        e(), e(), e(), e(), e(),
+        { r: "R1", detail: "Vertragsrecht, Datenschutz" },
+        e(), e(),
+      ],
     },
     {
       name: "Technologische und digitale Transformation",
       istDigital: true,
+      istKI: true,
       digitalNote: "Hauptaspekt — KI, digitale Werkzeuge, Transformation",
-      zirkular: [null, null, null, "R1", null, null, "R2", null],
+      zellen: [
+        e(), e(), e(),
+        { r: "R1", detail: "Werkzeugkasten: Smartphone, Office, KI", istKI: true },
+        e(), e(),
+        { r: "R2", detail: "Trends in der digitalen Arbeitswelt, KI", istKI: true },
+        e(),
+      ],
     },
     {
       name: "Wirtschaft",
       istDigital: false,
-      zirkular: [null, "R1", null, null, null, null, "R2", null],
+      istKI: false,
+      zellen: [
+        e(),
+        { r: "R1", detail: "Konsum, Preisbildung, Märkte" },
+        e(), e(), e(), e(),
+        { r: "R2", detail: "Arbeitsmarkt, Lohn" },
+        e(),
+      ],
     },
   ],
 };

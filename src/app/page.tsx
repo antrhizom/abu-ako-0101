@@ -89,9 +89,9 @@ export default function Home() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {dimensionen.map((dim, i) => (
-              <DimensionCard key={dim.id} dim={dim} index={i} />
-            ))}
+            <DimensionCard dim={dimensionen[0]} matrix={matrixSprachmodi} index={0} />
+            <DimensionCard dim={dimensionen[1]} matrix={matrixKompetenzen} index={1} />
+            <DimensionCard dim={dimensionen[2]} matrix={matrixAspekte} index={2} />
           </div>
         </div>
       </section>

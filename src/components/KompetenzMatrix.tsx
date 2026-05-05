@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { MatrixDaten } from "@/lib/digitaleKompetenzen";
+import type { MatrixDaten, ZirkularZelle } from "@/lib/digitaleKompetenzen";
 import { themenKurzNamen } from "@/lib/digitaleKompetenzen";
 
 interface Props {
@@ -44,8 +44,14 @@ const dimensionLabels = {
   "gesellschaftliche-inhalte": "Gesellschaftliche Inhalte",
 };
 
+interface Hover {
+  row: number;
+  col: number;
+  zelle: ZirkularZelle;
+}
+
 export default function KompetenzMatrix({ matrix }: Props) {
-  const [hoveredItem, setHoveredItem] = useState<number | null>(null);
+  const [hover, setHover] = useState<Hover | null>(null);
   const c = colorMap[matrix.farbe];
 
   return (
@@ -54,14 +60,28 @@ export default function KompetenzMatrix({ matrix }: Props) {
         <span className="text-2xl">{c.icon}</span>
         <h3 className={`text-xl font-bold ${c.accent}`}>{dimensionLabels[matrix.dimension]}</h3>
       </div>
-      <p className="text-xs text-zinc-500 mb-5">
-        Wiederholungs-Matrix · R1 = Einführung · R2/R3 = Vertiefung · <span className="text-white">●</span> = digital relevant
+      <p className="text-xs text-zinc-500 mb-1">
+        Wiederholungs-Matrix · R1 = Einführung · R2/R3 = Vertiefung
       </p>
+      <div className="flex flex-wrap gap-3 text-[10px] text-zinc-500 mb-5">
+        <span className="flex items-center gap-1.5">
+          <span className={`h-1.5 w-1.5 rounded-full ${c.digitalDot}`} />
+          digital
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400 animate-pulse-glow" />
+          KI explizit gefragt
+        </span>
+        <span className="text-zinc-600">→ Hovere über jede Zelle für Details</span>
+      </div>
 
       <div className="overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6">
-        <div className="min-w-[700px]">
-          {/* Header: Themen-Nummern */}
-          <div className="grid gap-1 mb-2" style={{ gridTemplateColumns: "minmax(180px, 1.6fr) repeat(8, minmax(0, 1fr))" }}>
+        <div className="min-w-[750px]">
+          {/* Header */}
+          <div
+            className="grid gap-1 mb-2"
+            style={{ gridTemplateColumns: "minmax(180px, 1.6fr) repeat(8, minmax(0, 1fr))" }}
+          >
             <div />
             {themenKurzNamen.map((tn, i) => (
               <div key={i} className="text-center">
@@ -83,65 +103,101 @@ export default function KompetenzMatrix({ matrix }: Props) {
                   gridTemplateColumns: "minmax(180px, 1.6fr) repeat(8, minmax(0, 1fr))",
                   animationDelay: `${rowIdx * 0.04}s`,
                 }}
-                onMouseEnter={() => setHoveredItem(rowIdx)}
-                onMouseLeave={() => setHoveredItem(null)}
               >
-                {/* Item-Name */}
                 <div className="flex items-center gap-1.5 pr-2">
-                  {item.istDigital && (
+                  {item.istKI ? (
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-fuchsia-400 animate-pulse-glow shrink-0"
+                      title="KI-relevant"
+                    />
+                  ) : item.istDigital ? (
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${c.digitalDot} animate-pulse-glow shrink-0`}
                       title="Digital relevant"
                     />
+                  ) : (
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-700 shrink-0" />
                   )}
                   <span
                     className={`text-[11px] leading-tight ${
-                      item.istDigital ? "text-zinc-200 font-medium" : "text-zinc-500"
+                      item.istKI
+                        ? "text-fuchsia-200 font-medium"
+                        : item.istDigital
+                        ? "text-zinc-200 font-medium"
+                        : "text-zinc-500"
                     }`}
                   >
                     {item.name}
                   </span>
                 </div>
 
-                {/* 8 Themen-Zellen */}
-                {item.zirkular.map((r, colIdx) => (
-                  <div
-                    key={colIdx}
-                    className={`h-9 rounded-md flex items-center justify-center text-[10px] font-bold border transition-all ${
-                      r === null
-                        ? "bg-white/[0.02] border-white/5 text-transparent"
-                        : item.istDigital
-                        ? `${c.cellDigital} shadow-md ${c.glow}`
-                        : c.cellNormal
-                    }`}
-                  >
-                    {r ?? "·"}
-                  </div>
-                ))}
+                {item.zellen.map((zelle, colIdx) => {
+                  const empty = zelle.r === null;
+                  const isKI = zelle.istKI === true;
+                  const isHovered = hover?.row === rowIdx && hover?.col === colIdx;
+
+                  return (
+                    <div
+                      key={colIdx}
+                      onMouseEnter={() => !empty && setHover({ row: rowIdx, col: colIdx, zelle })}
+                      onMouseLeave={() => setHover(null)}
+                      className={`relative h-9 rounded-md flex items-center justify-center text-[10px] font-bold border transition-all ${
+                        empty
+                          ? "bg-white/[0.02] border-white/5 text-transparent"
+                          : isKI
+                          ? "bg-fuchsia-500/40 text-fuchsia-100 border-fuchsia-400/70 shadow-md shadow-fuchsia-500/40 cursor-help animate-pulse-glow"
+                          : item.istDigital
+                          ? `${c.cellDigital} shadow-md ${c.glow} cursor-help`
+                          : `${c.cellNormal} cursor-help`
+                      } ${isHovered ? "scale-110 z-10" : ""}`}
+                    >
+                      {zelle.r ?? "·"}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
 
           {/* Hover-Detail */}
-          {hoveredItem !== null && matrix.items[hoveredItem].istDigital && matrix.items[hoveredItem].digitalNote && (
-            <div className={`mt-4 rounded-xl border ${c.border} bg-black/30 p-3 animate-fade-in`}>
-              <p className="text-[11px] text-zinc-400">
-                <span className={`${c.accent} font-medium`}>{matrix.items[hoveredItem].name}:</span>{" "}
-                {matrix.items[hoveredItem].digitalNote}
+          {hover && hover.zelle.r && (
+            <div
+              className={`mt-4 rounded-xl border ${
+                hover.zelle.istKI
+                  ? "border-fuchsia-400/50 bg-fuchsia-500/10"
+                  : `${c.border} bg-black/30`
+              } p-3 animate-fade-in`}
+            >
+              <div className="flex items-baseline gap-2 mb-1">
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-wide ${
+                    hover.zelle.istKI ? "text-fuchsia-300" : c.accent
+                  }`}
+                >
+                  T{hover.col + 1} · {themenKurzNamen[hover.col]}
+                </span>
+                <span
+                  className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${
+                    hover.zelle.istKI
+                      ? "bg-fuchsia-500/30 text-fuchsia-200 border border-fuchsia-400/50"
+                      : "bg-white/10 text-zinc-300"
+                  }`}
+                >
+                  {hover.zelle.r}
+                </span>
+                {hover.zelle.istKI && (
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-bold bg-fuchsia-500/30 text-fuchsia-200 border border-fuchsia-400/50">
+                    KI
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-200 mb-1">
+                <span className="text-zinc-400">{matrix.items[hover.row].name}:</span>{" "}
+                {hover.zelle.detail}
               </p>
             </div>
           )}
         </div>
-      </div>
-
-      {/* Legende */}
-      <div className="mt-5 flex flex-wrap items-center gap-3 text-[10px] text-zinc-500">
-        <span className="flex items-center gap-1.5">
-          <span className={`h-1.5 w-1.5 rounded-full ${c.digitalDot}`} />
-          digital relevant
-        </span>
-        <span className={`px-2 py-0.5 rounded ${c.cellDigital} border text-[10px]`}>R1 digital</span>
-        <span className={`px-2 py-0.5 rounded ${c.cellNormal} border text-[10px]`}>R1 nicht digital</span>
       </div>
     </div>
   );
