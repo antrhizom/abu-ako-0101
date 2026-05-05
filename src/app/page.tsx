@@ -1,7 +1,14 @@
-import { dimensionen, themenDigital } from "@/lib/digitaleKompetenzen";
+import {
+  dimensionen,
+  themenDigital,
+  matrixSprachmodi,
+  matrixKompetenzen,
+  matrixAspekte,
+} from "@/lib/digitaleKompetenzen";
 import FloatingParticles from "@/components/FloatingParticles";
 import DimensionCard from "@/components/DimensionCard";
 import ThemenIntensitaet from "@/components/ThemenIntensitaet";
+import KompetenzMatrix from "@/components/KompetenzMatrix";
 
 export default function Home() {
   return (
@@ -85,6 +92,28 @@ export default function Home() {
             {dimensionen.map((dim, i) => (
               <DimensionCard key={dim.id} dim={dim} index={i} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Wiederholungs-Matrizen */}
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 animate-slide-up">
+              <span className="gradient-text">Zirkularität</span> & digitale Anforderungen
+            </h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              Pro Kompetenzdimension siehst du, in welchem Thema ein Bereich eingeführt (R1)
+              und wo er wiederholt/vertieft (R2/R3) wird. Zellen mit Farbglühen markieren,
+              wo digitale Kompetenzen explizit gefragt sind.
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            <KompetenzMatrix matrix={matrixSprachmodi} />
+            <KompetenzMatrix matrix={matrixKompetenzen} />
+            <KompetenzMatrix matrix={matrixAspekte} />
           </div>
         </div>
       </section>

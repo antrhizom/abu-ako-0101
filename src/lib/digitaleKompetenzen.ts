@@ -127,6 +127,224 @@ export interface ThemaDigital {
   digitalKurz: string;
 }
 
+// === MATRIX-DATEN ===
+// Pro Item: Wo wird es eingeführt (R1) bzw. wiederholt (R2/R3) und ob digital gefragt
+export type RKennung = "R1" | "R2" | "R3" | null;
+
+export interface MatrixItem {
+  name: string;
+  istDigital: boolean; // Ob dieser Bereich digitale Kompetenzen einfordert
+  digitalNote?: string; // Kurzhinweis warum digital
+  zirkular: RKennung[]; // Index 0-7 für Themen 1-8
+}
+
+export interface MatrixDaten {
+  dimension: "sprachmodi" | "schluesselkompetenzen" | "gesellschaftliche-inhalte";
+  farbe: "amber" | "blue" | "emerald";
+  items: MatrixItem[];
+}
+
+// Themenkürzel für die Matrix-Header
+export const themenKurzNamen = [
+  "Berufseinstieg",
+  "Konsum",
+  "Gesundheit",
+  "Medien",
+  "Meinung",
+  "Verträge",
+  "Arbeit",
+  "Kultur",
+];
+
+// Sprachmodi-Matrix (9 Sprachmodi × 8 Themen)
+export const matrixSprachmodi: MatrixDaten = {
+  dimension: "sprachmodi",
+  farbe: "amber",
+  items: [
+    {
+      name: "Rezeption mündlich",
+      istDigital: false,
+      zirkular: [null, null, "R1", null, "R2", null, null, null],
+    },
+    {
+      name: "Rezeption audiovisuell",
+      istDigital: true,
+      digitalNote: "Videos, Podcasts, KI-generierte Medien",
+      zirkular: [null, "R1", null, "R2", null, null, "R3", null],
+    },
+    {
+      name: "Rezeption schriftlich und bildlich",
+      istDigital: true,
+      digitalNote: "Digitale Texte, Websites, Infografiken",
+      zirkular: ["R1", null, null, "R2", null, null, null, "R3"],
+    },
+    {
+      name: "Produktion mündlich",
+      istDigital: false,
+      zirkular: [null, null, null, null, "R1", "R2", null, null],
+    },
+    {
+      name: "Produktion schriftlich und bildlich",
+      istDigital: true,
+      digitalNote: "Digitale Dokumente, Bewerbungen, Inhalte",
+      zirkular: [null, null, "R1", null, "R2", null, "R3", null],
+    },
+    {
+      name: "Produktion multimedial",
+      istDigital: true,
+      digitalNote: "Videos, Präsentationen, KI-Bilder",
+      zirkular: [null, null, null, null, "R1", null, null, "R2"],
+    },
+    {
+      name: "Interaktion und Kollaboration mündlich",
+      istDigital: false,
+      zirkular: ["R1", null, null, null, "R2", null, null, null],
+    },
+    {
+      name: "Interaktion und Kollaboration schriftlich",
+      istDigital: true,
+      digitalNote: "E-Mail, Chat, schriftliche Beschwerden",
+      zirkular: [null, null, null, "R1", null, "R2", "R3", null],
+    },
+    {
+      name: "Interaktion und Kollaboration digital",
+      istDigital: true,
+      digitalNote: "Videokonferenz, KI-Tools, digitale Teamarbeit",
+      zirkular: ["R1", null, null, "R2", null, null, null, null],
+    },
+  ],
+};
+
+// Schlüsselkompetenzen-Matrix (12 × 8)
+export const matrixKompetenzen: MatrixDaten = {
+  dimension: "schluesselkompetenzen",
+  farbe: "blue",
+  items: [
+    {
+      name: "Ziele setzen und anpassen",
+      istDigital: true,
+      digitalNote: "Digitale Planung, KI-gestützte Reflexion",
+      zirkular: ["R1", null, null, null, null, null, "R2", null],
+    },
+    {
+      name: "Verständnis fördern",
+      istDigital: false,
+      zirkular: ["R1", null, "R2", null, null, "R3", null, null],
+    },
+    {
+      name: "Anpassung",
+      istDigital: true,
+      digitalNote: "Neue Tools, KI, sich verändernde Plattformen",
+      zirkular: [null, null, null, "R1", null, null, "R2", null],
+    },
+    {
+      name: "Nachhaltigkeit",
+      istDigital: false,
+      zirkular: [null, "R1", null, null, null, null, null, "R2"],
+    },
+    {
+      name: "Innovation und Problemlösung",
+      istDigital: true,
+      digitalNote: "Digitale Werkzeuge zum Lösen von Aufgaben",
+      zirkular: [null, null, null, "R1", null, null, "R2", null],
+    },
+    {
+      name: "Quellen unterscheiden",
+      istDigital: true,
+      digitalNote: "KI-Inhalte, Fake News, Filterblasen erkennen",
+      zirkular: [null, null, null, "R1", "R2", null, null, null],
+    },
+    {
+      name: "Standpunkte begründen",
+      istDigital: false,
+      zirkular: [null, null, null, null, "R1", "R2", null, null],
+    },
+    {
+      name: "Werthaltungen reflektieren",
+      istDigital: true,
+      digitalNote: "Eigene Mediennutzung, Datenschutz hinterfragen",
+      zirkular: [null, "R1", null, "R2", null, null, null, "R3"],
+    },
+    {
+      name: "Teamarbeit",
+      istDigital: true,
+      digitalNote: "Digitale Zusammenarbeit, kollaborative Tools",
+      zirkular: ["R1", null, null, null, null, null, "R2", null],
+    },
+    {
+      name: "Partizipation",
+      istDigital: true,
+      digitalNote: "Digitale Teilhabe, Online-Beteiligung",
+      zirkular: [null, null, null, null, "R1", null, null, "R2"],
+    },
+    {
+      name: "Lebensphasen planen",
+      istDigital: false,
+      zirkular: ["R1", null, null, null, null, null, "R2", null],
+    },
+    {
+      name: "Mehrdeutigkeit",
+      istDigital: true,
+      digitalNote: "Mit KI-Unsicherheit umgehen",
+      zirkular: [null, null, null, "R1", "R2", null, null, null],
+    },
+  ],
+};
+
+// Gesellschaftliche Inhalte (Aspekte)-Matrix (8 × 8)
+export const matrixAspekte: MatrixDaten = {
+  dimension: "gesellschaftliche-inhalte",
+  farbe: "emerald",
+  items: [
+    {
+      name: "Ethik",
+      istDigital: true,
+      digitalNote: "Digitalethik, KI-Verantwortung",
+      zirkular: [null, "R1", null, "R2", null, null, null, "R3"],
+    },
+    {
+      name: "Identität und Sozialisation",
+      istDigital: true,
+      digitalNote: "Digitale Identität, Online-Rollen",
+      zirkular: ["R1", null, null, "R2", null, null, "R3", null],
+    },
+    {
+      name: "Kultur",
+      istDigital: true,
+      digitalNote: "Digitale Kunst, Memes, Online-Kultur",
+      zirkular: [null, null, null, null, null, null, null, "R1"],
+    },
+    {
+      name: "Ökologie",
+      istDigital: false,
+      zirkular: [null, "R1", null, null, null, null, null, null],
+    },
+    {
+      name: "Politik",
+      istDigital: true,
+      digitalNote: "Digitale Demokratie, politische Meinungsbildung online",
+      zirkular: [null, null, null, null, "R1", null, null, null],
+    },
+    {
+      name: "Recht",
+      istDigital: true,
+      digitalNote: "Datenschutz, Urheberrecht, digitale Verträge",
+      zirkular: [null, null, null, null, null, "R1", null, null],
+    },
+    {
+      name: "Technologische und digitale Transformation",
+      istDigital: true,
+      digitalNote: "Hauptaspekt — KI, digitale Werkzeuge, Transformation",
+      zirkular: [null, null, null, "R1", null, null, "R2", null],
+    },
+    {
+      name: "Wirtschaft",
+      istDigital: false,
+      zirkular: [null, "R1", null, null, null, null, "R2", null],
+    },
+  ],
+};
+
 export const themenDigital: ThemaDigital[] = [
   { nr: 1, titel: "Ins Berufsleben einsteigen", digitalIntensitaet: 4, digitalKurz: "Digitaler Lern- und Arbeitsplatz, Videokonferenz, KI-Tools im Team" },
   { nr: 2, titel: "Bewusst konsumieren und handeln", digitalIntensitaet: 3, digitalKurz: "Digitale Angebote, Werbung im digitalen Raum" },
