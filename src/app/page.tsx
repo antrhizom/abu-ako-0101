@@ -5,6 +5,7 @@ import {
   matrixKompetenzen,
   matrixAspekte,
 } from "@/lib/digitaleKompetenzen";
+import Link from "next/link";
 import FloatingParticles from "@/components/FloatingParticles";
 import DimensionCard from "@/components/DimensionCard";
 import ThemenIntensitaet from "@/components/ThemenIntensitaet";
@@ -189,6 +190,33 @@ export default function Home() {
               Die interaktive Lernumgebung mit Ressourcen, Quittungen und Fortschritts-Tracking
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Hintergrund: Philosophie */}
+      <section className="px-6 pb-16">
+        <div className="mx-auto max-w-3xl">
+          <Link
+            href="/pli-trace-reseau-monade"
+            className="block glass rounded-3xl p-6 text-center hover:bg-white/10 transition-colors"
+          >
+            <div className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">
+              Hintergrund
+            </div>
+            <div className="text-lg font-bold">
+              <span className="text-amber-300">pli</span>
+              <span className="text-zinc-600"> · </span>
+              <span className="text-blue-300">trace</span>
+              <span className="text-zinc-600"> · </span>
+              <span className="text-emerald-300">réseau</span>
+              <span className="text-zinc-600"> · </span>
+              <span className="gradient-text">monade</span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-500">
+              Warum sich eine Welt nicht berechnen und nicht synchronisieren lässt — Leibniz,
+              Deleuze, Derrida, Latour als Monaden zum Hineinzoomen
+            </p>
+          </Link>
         </div>
       </section>
 
