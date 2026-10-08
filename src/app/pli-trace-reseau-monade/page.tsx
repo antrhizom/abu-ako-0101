@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import MonadenWelt from "@/components/MonadenWelt";
 import Harmonie from "@/components/Harmonie";
@@ -9,18 +10,30 @@ export const metadata: Metadata = {
     "Leibniz' Monade will eine Welt berechnen und synchronisieren, die sich weder berechnen noch synchronisieren lässt. Falte, Spur und Netzwerk antworten darauf.",
 };
 
-export default function PliTraceReseauMonade() {
+export default async function PliTraceReseauMonade() {
+  // Unter pli-trace-reseau-monade.vercel.app eigenständig: keine Links zur ABU-Seite
+  const host = (await headers()).get("host") ?? "";
+  const standalone =
+    host.startsWith("pli-trace-reseau-monade") || process.env.NEXT_PUBLIC_SITE === "pli-trace-reseau-monade";
+
   return (
     <div className="relative min-h-screen text-white">
       {/* Hero */}
       <section className="relative pt-16 pb-8 px-6">
         <div className="mx-auto max-w-6xl text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs font-mono text-indigo-300 mb-6 hover:bg-white/10 transition-colors"
-          >
-            ← ABU AKO 0101
-          </Link>
+          {standalone ? (
+            <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs font-mono text-indigo-300 mb-6">
+              <span className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse-glow" />
+              Monaden zum Hineinzoomen
+            </div>
+          ) : (
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs font-mono text-indigo-300 mb-6 hover:bg-white/10 transition-colors"
+            >
+              ← ABU AKO 0101
+            </Link>
+          )}
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-5 animate-slide-up">
             <span className="text-amber-300">pli</span>
@@ -155,7 +168,7 @@ export default function PliTraceReseauMonade() {
         <div className="mx-auto max-w-3xl">
           <div className="glass rounded-3xl p-8">
             <div className="text-xs font-mono uppercase tracking-wider text-indigo-300 mb-3">
-              Für den ABU-Unterricht
+              Für den Unterricht
             </div>
             <p className="text-sm text-zinc-300 leading-relaxed">
               Ein Lehrplan, eine Kompetenzmatrix, ein Dashboard: Das sind Versuche, Lernende
@@ -164,18 +177,20 @@ export default function PliTraceReseauMonade() {
               Spuren lesen (nichts ist abgeschlossen), übersetzen (Verbindungen pflegen,
               statt Gleichschritt zu erwarten).
             </p>
-            <Link
-              href="/"
-              className="mt-4 inline-block text-sm gradient-text font-medium hover:opacity-80 transition-opacity"
-            >
-              Zur Kompetenzmatrix →
-            </Link>
+            {!standalone && (
+              <Link
+                href="/"
+                className="mt-4 inline-block text-sm gradient-text font-medium hover:opacity-80 transition-opacity"
+              >
+                Zur Kompetenzmatrix →
+              </Link>
+            )}
           </div>
         </div>
       </section>
 
       <footer className="px-6 py-8 text-center text-xs text-zinc-600">
-        pli · trace · réseau · monade — ABU AKO 0101
+        pli · trace · réseau · monade{standalone ? "" : " — ABU AKO 0101"}
       </footer>
     </div>
   );
