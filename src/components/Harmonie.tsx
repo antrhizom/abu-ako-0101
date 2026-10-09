@@ -98,21 +98,21 @@ export default function Harmonie() {
           ctx.beginPath();
           ctx.moveTo(cx + r * 1.15, cy);
           ctx.lineTo(cx + zelle - r * 1.15, cy);
-          ctx.strokeStyle = "rgba(230,224,212,0.12)";
+          ctx.strokeStyle = "rgba(43,39,35,0.15)";
           ctx.lineWidth = 0.6;
           ctx.stroke();
         }
 
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(230,224,212,0.22)";
+        ctx.strokeStyle = "rgba(43,39,35,0.28)";
         ctx.lineWidth = 0.8;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(cx + Math.cos(winkel[i]) * r * 0.82, cy + Math.sin(winkel[i]) * r * 0.82);
-        ctx.strokeStyle = `hsl(${40 - diff * 26}, ${15 + diff * 30}%, ${85 - diff * 23}%)`;
+        ctx.strokeStyle = `hsl(${30 - diff * 16}, ${15 + diff * 40}%, ${20 + diff * 24}%)`;
         ctx.lineWidth = 1.4;
         ctx.lineCap = "round";
         ctx.stroke();
@@ -140,14 +140,14 @@ export default function Harmonie() {
             key={k.id}
             onClick={() => setModus(k.id)}
             className={`transition-colors ${
-              modus === k.id ? "text-[#ece6da]" : "text-[#6f6a61] hover:text-[#b5afa3]"
+              modus === k.id ? "text-[#1f1c19]" : "text-[#9a9286] hover:text-[#3a352f]"
             }`}
           >
             {k.label}
           </button>
         ))}
       </div>
-      <p className="mt-1 font-sans text-[10px] tracking-[0.06em] text-[#6a655c]">
+      <p className="mt-1 font-sans text-[10px] tracking-[0.06em] text-[#9a9286]">
         {MODI.find((k) => k.id === modus)?.text}
       </p>
     </div>

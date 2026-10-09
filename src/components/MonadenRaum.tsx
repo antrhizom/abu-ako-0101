@@ -5,6 +5,7 @@ import Link from "next/link";
 import { welt, type Monade } from "@/lib/monaden";
 import { zitatFuer } from "@/lib/zitate";
 import Harmonie from "@/components/Harmonie";
+import type { Kunstwerk } from "@/lib/kunst";
 
 /**
  * Der Monaden-Raum.
@@ -87,7 +88,7 @@ function ausMonade(m: Monade): Knoten {
 }
 
 const WURZEL = ausMonade(welt);
-const BG = "#0b0b0c";
+const BG = "#f1ece3";
 const FUELLE = 0.84; // Radius einer fokussierten Monade, relativ zur halben Bildschirmkante
 
 /* ---------------- Die eine Welt ---------------- */
@@ -216,9 +217,11 @@ function phasenVon(seed: number): Phasen {
 export default function MonadenRaum({
   standalone,
   serif,
+  kunst,
 }: {
   standalone: boolean;
   serif: string;
+  kunst: Kunstwerk[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [modus, setModus] = useState<Modus>("monade");
@@ -238,6 +241,13 @@ export default function MonadenRaum({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const ctxLs = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
+    const bilder = new Map<string, HTMLImageElement>();
+    for (const k of kunst) {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = k.src;
+      bilder.set(k.monade, img);
+    }
     const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let W = 0;
@@ -550,7 +560,7 @@ export default function MonadenRaum({
       const h = istWelt ? 40 : k.hue;
       const sat = istWelt ? 8 : 18;
       ctx.lineWidth = 0.6;
-      ctx.strokeStyle = `hsla(${h}, ${sat}%, 80%, ${(istWelt ? 0.05 : 0.12) * alpha})`;
+      ctx.strokeStyle = `hsla(${h}, ${sat}%, 24%, ${(istWelt ? 0.07 : 0.16) * alpha})`;
       ctx.beginPath();
       const K = WELT.kanten;
       for (let e = 0; e < K.length; e += 2) {
@@ -564,7 +574,7 @@ export default function MonadenRaum({
         const a = (0.14 + 0.86 * deut) * Math.min(1, PS[i] * 1.1) * alpha;
         if (a < 0.012) continue;
         const sz = Math.max(0.5, (0.5 + 1.7 * deut) * PS[i] * groesse);
-        ctx.fillStyle = `hsla(${h}, ${sat}%, 85%, ${a})`;
+        ctx.fillStyle = `hsla(${h}, ${sat}%, 20%, ${a})`;
         ctx.beginPath();
         ctx.arc(PX[i], PY[i], sz, 0, Math.PI * 2);
         ctx.fill();
@@ -574,20 +584,22 @@ export default function MonadenRaum({
     const zeichneHuelle = (c: Knoten, s: Kreis, a: number, hover: boolean) => {
       const h = c.hue;
       const offen = c.m?.status === "offen";
-      // Schein
-      const glow = ctx.createRadialGradient(s.x, s.y, s.r * 0.9, s.x, s.y, s.r * 1.8);
-      glow.addColorStop(0, `hsla(${h}, 30%, 60%, ${(hover ? 0.13 : 0.06) * a})`);
-      glow.addColorStop(1, `hsla(${h}, 30%, 60%, 0)`);
-      ctx.fillStyle = glow;
+      // Schatten: die Monade schwebt über dem Papier
+      const sx = s.x + s.r * 0.18;
+      const sy = s.y + s.r * 0.34;
+      const schatten = ctx.createRadialGradient(sx, sy, s.r * 0.2, sx, sy, s.r * 1.35);
+      schatten.addColorStop(0, `rgba(70, 55, 40, ${(hover ? 0.22 : 0.15) * a})`);
+      schatten.addColorStop(1, "rgba(70, 55, 40, 0)");
+      ctx.fillStyle = schatten;
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r * 1.8, 0, Math.PI * 2);
+      ctx.arc(sx, sy, s.r * 1.35, 0, Math.PI * 2);
       ctx.fill();
       // Körper, von links oben beleuchtet
-      const ka = offen ? a * 0.55 : a;
-      const body = ctx.createRadialGradient(s.x - s.r * 0.35, s.y - s.r * 0.4, s.r * 0.05, s.x, s.y, s.r * 1.05);
-      body.addColorStop(0, `hsla(${h}, 16%, 34%, ${ka})`);
-      body.addColorStop(0.45, `hsla(${h}, 13%, 16%, ${ka})`);
-      body.addColorStop(1, `hsla(${h}, 12%, 6%, ${ka})`);
+      const ka = offen ? a * 0.6 : a;
+      const body = ctx.createRadialGradient(s.x - s.r * 0.35, s.y - s.r * 0.42, s.r * 0.04, s.x, s.y, s.r * 1.04);
+      body.addColorStop(0, `hsla(${h}, 35%, 99%, ${ka})`);
+      body.addColorStop(0.5, `hsla(${h}, 24%, 87%, ${ka})`);
+      body.addColorStop(1, `hsla(${h}, 22%, 68%, ${ka})`);
       ctx.fillStyle = body;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
@@ -595,18 +607,32 @@ export default function MonadenRaum({
       // Rand
       if (offen) ctx.setLineDash([2, 4]);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = `hsla(${h}, 20%, 82%, ${(hover ? 0.42 : 0.15) * a})`;
+      ctx.strokeStyle = `hsla(${h}, 22%, 30%, ${(hover ? 0.5 : 0.22) * a})`;
       ctx.stroke();
       ctx.setLineDash([]);
       // Glanzlicht
       if (s.r > 6) {
         ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r * 0.9, Math.PI * 1.08, Math.PI * 1.42);
-        ctx.lineWidth = Math.min(2, s.r * 0.03);
+        ctx.arc(s.x, s.y, s.r * 0.88, Math.PI * 1.08, Math.PI * 1.42);
+        ctx.lineWidth = Math.min(2.4, s.r * 0.035);
         ctx.lineCap = "round";
-        ctx.strokeStyle = `hsla(${h}, 30%, 92%, ${0.2 * a})`;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.75 * a})`;
         ctx.stroke();
       }
+    };
+
+    // Kunstwerk, randfüllend in den Kreis der Monade gelegt
+    const zeichneBild = (img: HTMLImageElement, cx: number, cy: number, R: number, a: number) => {
+      if (!img.complete || !img.naturalWidth || a < 0.005) return;
+      const gross = 4 * Math.max(W, H);
+      const ausblenden = R > gross ? Math.max(0, 2 - R / gross) : 1;
+      if (ausblenden <= 0) return;
+      const k = Math.max((2 * R) / img.naturalWidth, (2 * R) / img.naturalHeight);
+      const w = img.naturalWidth * k;
+      const h = img.naturalHeight * k;
+      ctx.globalAlpha = a * ausblenden;
+      ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+      ctx.globalAlpha = 1;
     };
 
     const zeichneDeko = (k: Knoten, kinder: Knoten[], scr: Kreis[], a: number) => {
@@ -614,7 +640,7 @@ export default function MonadenRaum({
       const h = k.key === "welt" ? 40 : k.hue;
       if (m === "ebene") {
         ctx.lineWidth = 0.6;
-        ctx.strokeStyle = `hsla(${h}, 10%, 80%, ${0.09 * a})`;
+        ctx.strokeStyle = `hsla(${h}, 12%, 30%, ${0.16 * a})`;
         for (const s of scr) {
           const half = (s.r / 0.3) * 0.46;
           ctx.strokeRect(s.x - half, s.y - half, half * 2, half * 2);
@@ -649,14 +675,14 @@ export default function MonadenRaum({
           const x1 = B.x - ux * B.r * 1.15;
           const y1 = B.y - uy * B.r * 1.15;
           ctx.lineWidth = 0.7;
-          ctx.strokeStyle = `hsla(${kinder[i].hue}, 14%, 78%, ${0.18 * a})`;
+          ctx.strokeStyle = `hsla(${kinder[i].hue}, 18%, 28%, ${0.32 * a})`;
           ctx.beginPath();
           ctx.moveTo(x0, y0);
           ctx.lineTo(x1, y1);
           ctx.stroke();
           // Übersetzung: ein Punkt wandert über die Verbindung
           const q = (t * 0.09 + (hash(kinder[i].key + kinder[j].key) % 100) / 100) % 1;
-          ctx.fillStyle = `hsla(${kinder[i].hue}, 25%, 88%, ${0.55 * a})`;
+          ctx.fillStyle = `hsla(${kinder[i].hue}, 30%, 25%, ${0.7 * a})`;
           ctx.beginPath();
           ctx.arc(x0 + (x1 - x0) * q, y0 + (y1 - y0) * q, 1.4, 0, Math.PI * 2);
           ctx.fill();
@@ -666,7 +692,7 @@ export default function MonadenRaum({
         ctx.lineWidth = 0.7;
         ctx.setLineDash([3, 5]);
         ctx.lineDashOffset = -t * 6;
-        ctx.strokeStyle = `hsla(${h}, 15%, 80%, ${0.28 * a})`;
+        ctx.strokeStyle = `hsla(${h}, 15%, 28%, ${0.42 * a})`;
         for (let e = 0; e < ord.length - 1; e++) {
           const A = scr[ord[e]];
           const B = scr[ord[e + 1]];
@@ -695,7 +721,7 @@ export default function MonadenRaum({
           const A = kette[i];
           const B = kette[i + 1];
           const hell = B.y < A.y;
-          ctx.fillStyle = `hsla(${h}, 10%, 72%, ${(hell ? 0.075 : 0.03) * a})`;
+          ctx.fillStyle = hell ? `hsla(${h}, 20%, 99%, ${0.5 * a})` : `hsla(${h}, 15%, 40%, ${0.09 * a})`;
           ctx.beginPath();
           ctx.moveTo(A.x, A.y - w);
           ctx.lineTo(B.x, B.y - w);
@@ -705,7 +731,7 @@ export default function MonadenRaum({
           ctx.fill();
         }
         ctx.lineWidth = 0.6;
-        ctx.strokeStyle = `hsla(${h}, 12%, 80%, ${0.22 * a})`;
+        ctx.strokeStyle = `hsla(${h}, 12%, 30%, ${0.28 * a})`;
         for (const p of pts) {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y - w);
@@ -736,12 +762,14 @@ export default function MonadenRaum({
         ctx.fillStyle = BG;
         ctx.fillRect(0, 0, W, H);
       } else {
-        ctx.fillStyle = `hsla(${k.hue}, 14%, 5%, ${alpha})`;
+        ctx.fillStyle = `hsla(${k.hue}, 26%, 94%, ${alpha})`;
         ctx.beginPath();
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
         ctx.fill();
       }
       const tieferFokus = fokusSig.startsWith(sig([...pfad, ...rel]) + "/");
+      const bild = bilder.get(k.key);
+      if (bild) zeichneBild(bild, f.x, f.y, f.r, alpha * (istWelt ? 0.3 : 0.4) * (tieferFokus ? 0.45 : 1));
       zeichneWelt(k, f.x, f.y, f.r, alpha * (istWelt ? 0.8 : 1) * (tieferFokus && !istWelt ? 0.35 : 1), istWelt);
 
       const kinder = kinderVon(k);
@@ -753,8 +781,8 @@ export default function MonadenRaum({
       if (!istWurzel) {
         // Innenseite der Kugel: zum Rand hin dunkler
         const v = ctx.createRadialGradient(f.x, f.y, f.r * 0.55, f.x, f.y, f.r);
-        v.addColorStop(0, `hsla(${k.hue}, 20%, 3%, 0)`);
-        v.addColorStop(1, `hsla(${k.hue}, 20%, 3%, ${0.6 * alpha})`);
+        v.addColorStop(0, `hsla(${k.hue}, 22%, 70%, 0)`);
+        v.addColorStop(1, `hsla(${k.hue}, 22%, 66%, ${0.55 * alpha})`);
         ctx.fillStyle = v;
         ctx.beginPath();
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
@@ -778,7 +806,7 @@ export default function MonadenRaum({
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.lineWidth = 1;
-          ctx.strokeStyle = `hsla(${c.hue}, 20%, 82%, ${0.12 * o * alpha})`;
+          ctx.strokeStyle = `hsla(${c.hue}, 20%, 32%, ${0.24 * o * alpha})`;
           ctx.stroke();
         }
         if (o < 0.99) zeichneHuelle(c, s, (1 - o) * alpha, hover);
@@ -794,14 +822,14 @@ export default function MonadenRaum({
         const fs = Math.max(W < 640 ? 10.5 : 12, Math.min(17, s.r * 0.22));
         ctx.font = `400 ${fs}px ${serif}`;
         ctxLs.letterSpacing = "0px";
-        ctx.fillStyle = `hsla(40, 20%, 90%, ${(hover ? 0.95 : 0.7) * a})`;
+        ctx.fillStyle = `hsla(30, 15%, 16%, ${(hover ? 0.95 : 0.8) * a})`;
         const y = s.y + s.r + 9;
         ctx.fillText(c.m!.titel, s.x, y);
         const zweite = modusRef.current === "trace" && c.jahr ? String(c.jahr) : c.m!.autor?.split(" ·")[0];
         if (zweite && (W >= 640 || hover)) {
           ctx.font = `500 9px ui-sans-serif, system-ui, sans-serif`;
           ctxLs.letterSpacing = "1.6px";
-          ctx.fillStyle = `hsla(40, 10%, 70%, ${(hover ? 0.7 : 0.42) * a})`;
+          ctx.fillStyle = `hsla(30, 10%, 36%, ${(hover ? 0.85 : 0.6) * a})`;
           ctx.fillText(zweite.toUpperCase(), s.x, y + fs * 1.15);
           ctxLs.letterSpacing = "0px";
         }
@@ -1040,7 +1068,7 @@ export default function MonadenRaum({
       canvas.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("keydown", onKey);
     };
-  }, [serif]);
+  }, [serif, kunst]);
 
   /* ---------------- Lesefeld ---------------- */
 
@@ -1063,9 +1091,11 @@ export default function MonadenRaum({
       ];
 
   const fliege = (abs: Knoten[]) => steuer.current.fliegeZu(abs);
+  const bild = kunst.find((b) => b.monade === knoten.key);
+  const impressum = standalone ? "/impressum" : "/pli-trace-reseau-monade/impressum";
 
   return (
-    <div className="font-monade fixed inset-0 overflow-hidden bg-[#0b0b0c] text-[#e6e0d4]">
+    <div className="font-monade fixed inset-0 overflow-hidden bg-[#f1ece3] text-[#2b2723]">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full touch-none"
@@ -1073,21 +1103,21 @@ export default function MonadenRaum({
       />
 
       {/* Abdunklung für die Schrift */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#0b0b0c]/85 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0b0b0c]/70 to-transparent sm:hidden" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#f1ece3]/90 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#f1ece3]/80 to-transparent sm:hidden" />
       <div
-        className={`pointer-events-none absolute inset-y-0 right-0 hidden w-[34rem] bg-gradient-to-l from-[#0b0b0c] via-[#0b0b0c]/85 to-transparent transition-opacity duration-700 sm:block ${
+        className={`pointer-events-none absolute inset-y-0 right-0 hidden w-[34rem] bg-gradient-to-l from-[#f1ece3] via-[#f1ece3]/90 to-transparent transition-opacity duration-700 sm:block ${
           lesen ? "opacity-100" : "opacity-0"
         }`}
       />
 
       {/* Kopf */}
       <header className="absolute left-5 top-5 flex items-baseline gap-4 sm:left-8 sm:top-7">
-        <h1 className="text-[15px] tracking-[0.22em] text-[#b5afa3]">pli · trace · réseau · monade</h1>
+        <h1 className="text-[15px] tracking-[0.22em] text-[#5c564d]">pli · trace · réseau · monade</h1>
         {!standalone && (
           <Link
             href="/"
-            className="hidden font-sans text-[10px] uppercase tracking-[0.18em] text-[#6f6a61] transition-colors hover:text-[#b5afa3] sm:inline"
+            className="hidden font-sans text-[10px] uppercase tracking-[0.18em] text-[#9a9286] transition-colors hover:text-[#3a352f] sm:inline"
           >
             abu ako
           </Link>
@@ -1100,13 +1130,13 @@ export default function MonadenRaum({
           key={"z" + knoten.key}
           className="mr-fade group absolute left-5 right-5 top-14 sm:bottom-24 sm:left-8 sm:right-auto sm:top-auto sm:max-w-[30rem]"
         >
-          <blockquote className="line-clamp-4 text-[0.98rem] font-light italic leading-[1.5] text-[#e6e0d4]/90 sm:line-clamp-none sm:text-[1.22rem] sm:leading-[1.55]">
+          <blockquote className="line-clamp-4 text-[0.98rem] font-light italic leading-[1.5] text-[#2b2723]/90 sm:line-clamp-none sm:text-[1.22rem] sm:leading-[1.55]">
             «{zitat.de}»
           </blockquote>
-          <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.85rem] italic leading-[1.45] text-[#7d776d] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
+          <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.85rem] italic leading-[1.45] text-[#857d71] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
             {zitat.fr}
           </p>
-          <figcaption className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#6a655c]">
+          <figcaption className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">
             Leibniz, {zitat.ref}
             <span className="hidden sm:inline"> · fr ↑</span>
           </figcaption>
@@ -1116,16 +1146,16 @@ export default function MonadenRaum({
       {/* Lesefeld */}
       <aside
         key={"a" + knoten.key}
-        className="mr-fade absolute inset-x-4 bottom-[4.25rem] max-h-[60vh] overflow-y-auto rounded-sm border-t border-white/5 bg-[#0b0b0c]/85 px-4 py-3 sm:inset-x-auto sm:bottom-auto sm:right-8 sm:top-7 sm:max-h-[calc(100vh-9rem)] sm:w-[22rem] sm:border-0 sm:bg-transparent sm:p-0"
+        className="mr-fade absolute inset-x-4 bottom-[4.25rem] max-h-[60vh] overflow-y-auto rounded-sm border-t border-black/5 bg-[#f1ece3]/92 px-4 py-3 sm:inset-x-auto sm:bottom-auto sm:right-8 sm:top-7 sm:max-h-[calc(100vh-9rem)] sm:w-[22rem] sm:border-0 sm:bg-transparent sm:p-0"
       >
-        <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#8a847a]">{kicker}</div>
-        <h2 className="mt-1.5 text-[1.5rem] font-light leading-[1.1] text-[#ece6da] sm:mt-2 sm:text-[2.3rem]">{titel}</h2>
+        <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71]">{kicker}</div>
+        <h2 className="mt-1.5 text-[1.5rem] font-light leading-[1.1] text-[#1f1c19] sm:mt-2 sm:text-[2.3rem]">{titel}</h2>
         {m?.untertitel && (
-          <div className="mt-1 hidden text-[1.05rem] italic text-[#9b958a] sm:block">{m.untertitel}</div>
+          <div className="mt-1 hidden text-[1.05rem] italic text-[#7a7368] sm:block">{m.untertitel}</div>
         )}
         {these && (
           <p
-            className={`mt-2 text-[1rem] leading-[1.5] text-[#cfc9bd] sm:mt-4 sm:line-clamp-none sm:text-[1.08rem] ${
+            className={`mt-2 text-[1rem] leading-[1.5] text-[#3a352f] sm:mt-4 sm:line-clamp-none sm:text-[1.08rem] ${
               lesen ? "" : "line-clamp-2"
             }`}
           >
@@ -1134,14 +1164,14 @@ export default function MonadenRaum({
         )}
 
         {tiefe === 0 && (
-          <figure className={`group mt-6 border-l border-white/10 pl-4 sm:block ${lesen ? "block" : "hidden"}`}>
-            <blockquote className="text-[1.02rem] font-light italic leading-[1.55] text-[#e6e0d4]/85">
+          <figure className={`group mt-6 border-l border-black/10 pl-4 sm:block ${lesen ? "block" : "hidden"}`}>
+            <blockquote className="text-[1.02rem] font-light italic leading-[1.55] text-[#2b2723]/85">
               «{zitat.de}»
             </blockquote>
-            <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.82rem] italic leading-[1.45] text-[#7d776d] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
+            <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.82rem] italic leading-[1.45] text-[#857d71] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
               {zitat.fr}
             </p>
-            <figcaption className="mt-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#6a655c]">
+            <figcaption className="mt-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">
               Leibniz, {zitat.ref}
               <span className="hidden sm:inline"> · fr ↑</span>
             </figcaption>
@@ -1150,7 +1180,7 @@ export default function MonadenRaum({
 
         <button
           onClick={() => setLesen((v) => !v)}
-          className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#8a847a] transition-colors hover:text-[#e6e0d4] sm:mt-4"
+          className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] transition-colors hover:text-[#1f1c19] sm:mt-4"
         >
           {lesen ? "– weniger" : "+ lesen"}
         </button>
@@ -1158,7 +1188,7 @@ export default function MonadenRaum({
         {lesen && (
           <div className="mr-fade mt-4 space-y-3 pb-2">
             {text?.map((p, i) => (
-              <p key={i} className="text-[1rem] leading-[1.6] text-[#b8b2a6]">
+              <p key={i} className="text-[1rem] leading-[1.6] text-[#4a443d]">
                 {p}
               </p>
             ))}
@@ -1169,8 +1199,8 @@ export default function MonadenRaum({
             )}
             {m?.literatur && m.literatur.length > 0 && (
               <div className="pt-3">
-                <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#6a655c]">Literatur</div>
-                <ul className="mt-2 space-y-1.5 text-[0.85rem] leading-[1.45] text-[#7d776d]">
+                <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Literatur</div>
+                <ul className="mt-2 space-y-1.5 text-[0.85rem] leading-[1.45] text-[#857d71]">
                   {m.literatur.map((l) => (
                     <li key={l}>{l}</li>
                   ))}
@@ -1182,13 +1212,13 @@ export default function MonadenRaum({
 
         {m?.kinder && m.kinder.length > 0 && (
           <div className="mt-5 hidden sm:block">
-            <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#6a655c]">enthält</div>
+            <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">enthält</div>
             <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[0.98rem] italic">
               {m.kinder.map((k) => (
                 <button
                   key={k.id}
                   onClick={() => fliege([...fokus, ausMonade(k)])}
-                  className="text-[#a39d92] transition-colors hover:text-[#ece6da]"
+                  className="text-[#6d665c] transition-colors hover:text-[#1f1c19]"
                 >
                   {k.titel}
                 </button>
@@ -1196,19 +1226,43 @@ export default function MonadenRaum({
             </div>
           </div>
         )}
+        {bild && (
+          <p className="mt-5 font-sans text-[10px] leading-[1.5] tracking-[0.04em] text-[#9a9286]">
+            Bild:{" "}
+            <a href={bild.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
+              {bild.kuenstler ? `${bild.kuenstler}, ` : ""}
+              {bild.titel}
+              {bild.datum ? ` (${bild.datum})` : ""}
+            </a>
+            . The Met, Open Access, gemeinfrei (CC0).
+          </p>
+        )}
+        <Link
+          href={impressum}
+          className="mt-3 block font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286] sm:hidden"
+        >
+          Impressum
+        </Link>
       </aside>
 
+      <Link
+        href={impressum}
+        className="absolute bottom-7 right-8 hidden font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286] transition-colors hover:text-[#3a352f] sm:block"
+      >
+        Impressum
+      </Link>
+
       {/* Weg zurück */}
-      <nav className="absolute bottom-7 left-8 hidden items-center gap-2 font-sans text-[10px] uppercase tracking-[0.18em] text-[#6f6a61] sm:flex">
+      <nav className="absolute bottom-7 left-8 hidden items-center gap-2 font-sans text-[10px] uppercase tracking-[0.18em] text-[#9a9286] sm:flex">
         {fokus.map((k, i) => (
           <span key={k.key + i} className="flex items-center gap-2">
-            {i > 0 && <span className="text-[#4a4640]">/</span>}
+            {i > 0 && <span className="text-[#c3bbae]">/</span>}
             {i < fokus.length - 1 ? (
-              <button onClick={() => fliege(fokus.slice(0, i + 1))} className="transition-colors hover:text-[#e6e0d4]">
+              <button onClick={() => fliege(fokus.slice(0, i + 1))} className="transition-colors hover:text-[#1f1c19]">
                 {k.m ? (i === 0 ? "Welt" : k.m.titel) : "·"}
               </button>
             ) : (
-              <span className="text-[#a39d92]">{k.m ? (i === 0 ? "Welt" : k.m.titel) : "·"}</span>
+              <span className="text-[#6d665c]">{k.m ? (i === 0 ? "Welt" : k.m.titel) : "·"}</span>
             )}
           </span>
         ))}
@@ -1216,7 +1270,7 @@ export default function MonadenRaum({
       {tiefe > 0 && (
         <button
           onClick={() => fliege(fokus.slice(0, -1))}
-          className="absolute right-5 top-5 font-sans text-[10px] uppercase tracking-[0.2em] text-[#8a847a] sm:hidden"
+          className="absolute right-5 top-5 font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] sm:hidden"
         >
           ‹ zurück
         </button>
@@ -1225,7 +1279,7 @@ export default function MonadenRaum({
       {/* Verwandlungen */}
       <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:bottom-6">
         {hinweis && (
-          <div className="mr-fade mb-2 hidden font-sans text-[10px] uppercase tracking-[0.2em] text-[#8a847a] sm:block">
+          <div className="mr-fade mb-2 hidden font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] sm:block">
             eine Monade wählen — oder hineinzoomen
           </div>
         )}
@@ -1235,14 +1289,14 @@ export default function MonadenRaum({
               key={x.id}
               onClick={() => setModus(x.id)}
               className={`transition-colors ${
-                modus === x.id ? "text-[#ece6da]" : "text-[#6f6a61] hover:text-[#b5afa3]"
+                modus === x.id ? "text-[#1f1c19]" : "text-[#9a9286] hover:text-[#3a352f]"
               }`}
             >
               {x.label}
             </button>
           ))}
         </div>
-        <div className="hidden font-sans text-[10px] tracking-[0.08em] text-[#6a655c] sm:block">
+        <div className="hidden font-sans text-[10px] tracking-[0.08em] text-[#9a9286] sm:block">
           {MODI.find((x) => x.id === modus)?.text}
         </div>
       </div>

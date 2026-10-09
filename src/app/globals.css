@@ -155,8 +155,8 @@ body::after {
 .mr-fade { animation: mr-fade 1.1s ease both; }
 
 .font-monade ::-webkit-scrollbar { width: 3px; }
-.font-monade ::-webkit-scrollbar-thumb { background: rgba(230, 224, 212, 0.15); }
-.font-monade * { scrollbar-width: thin; scrollbar-color: rgba(230, 224, 212, 0.15) transparent; }
+.font-monade ::-webkit-scrollbar-thumb { background: rgba(43, 39, 35, 0.15); }
+.font-monade * { scrollbar-width: thin; scrollbar-color: rgba(43, 39, 35, 0.15) transparent; }
 
 @media (prefers-reduced-motion: reduce) {
   .mr-fade { animation: none; }
