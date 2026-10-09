@@ -103,7 +103,8 @@ async function ladeEintrag(e: KunstEintrag): Promise<Kunstwerk | null> {
     const o = (await res.json()) as MetObjekt;
     const quelle = o.primaryImageSmall || o.primaryImage;
     if (!o.isPublicDomain || !quelle) return null;
-    const { props } = getImageProps({ src: quelle, alt: o.title, width: 1920, height: 1280, quality: 75 });
+    // 960 px bei doppelter Dichte → Bild mit 1920 px Breite
+    const { props } = getImageProps({ src: quelle, alt: o.title, width: 960, height: 640, quality: 75 });
     return {
       monade: e.monade,
       metId: e.metId,
