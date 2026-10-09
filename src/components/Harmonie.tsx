@@ -5,17 +5,22 @@ import { useEffect, useRef, useState } from "react";
 /**
  * Die zwei Uhren von Leibniz (Système nouveau, 1695), erweitert auf viele.
  *
- * Modus «Harmonie»: ein einziges Gesetz treibt alle Zeiger — die prästabilierte
- * Harmonie, in der Gott alle Monaden von Anfang an aufeinander abgestimmt hat.
- * Modus «Welt»: jede Uhr folgt ihrem eigenen Gang. Nichts synchronisiert sie.
- * Modus «Übersetzung» (Latour): die Uhren gleichen sich nur lokal, mit
- * Verzögerung und Verlust an ihre Nachbarn an — Synchronisation als Arbeit,
- * nie als Zustand.
+ * «harmonie»: ein einziges Gesetz treibt alle Zeiger — die prästabilierte
+ * Harmonie. «welt»: jede Uhr folgt ihrem eigenen Gang, nichts synchronisiert
+ * sie. «übersetzung» (Latour): Die Uhren gleichen sich nur lokal, verzögert
+ * und mit Verlust an ihre Nachbarn an — Synchronisation als Arbeit.
  */
 
 type Modus = "harmonie" | "welt" | "uebersetzung";
 
-const ANZAHL = 24;
+const ANZAHL = 12;
+const SPALTEN = 6;
+
+const MODI: { id: Modus; label: string; text: string }[] = [
+  { id: "harmonie", label: "harmonie", text: "Ein Gesetz, eine Zeit — vom Uhrmacher eingestellt." },
+  { id: "welt", label: "welt", text: "Ohne Uhrmacher: Jede Uhr geht ihren eigenen Gang." },
+  { id: "uebersetzung", label: "übersetzung", text: "Latour: nur lokale Angleichung, verzögert, mit Verlust." },
+];
 
 export default function Harmonie() {
   const [modus, setModus] = useState<Modus>("harmonie");
@@ -32,14 +37,12 @@ export default function Harmonie() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Jede Uhr: Winkel + eigener Gang (leicht verschieden)
     const winkel = new Float64Array(ANZAHL);
     const gang = new Float64Array(ANZAHL);
     for (let i = 0; i < ANZAHL; i++) {
-      winkel[i] = 0;
-      gang[i] = 1 + (Math.sin(i * 12.9898) * 43758.5453 % 1) * 0.5 - 0.25; // ±25 %
+      gang[i] = 1 + (((Math.sin(i * 12.9898) * 43758.5453) % 1) * 0.5 - 0.25);
     }
-    let leitWinkel = 0;
+    let leit = 0;
     let raf = 0;
     let letzte = performance.now();
 
@@ -57,78 +60,63 @@ export default function Harmonie() {
       const dt = Math.min(0.05, (jetzt - letzte) / 1000);
       letzte = jetzt;
       const m = modusRef.current;
-      const omega = 1.2; // rad/s Grundgeschwindigkeit
-      leitWinkel += omega * dt;
-
+      const omega = 1.1;
+      leit += omega * dt;
       for (let i = 0; i < ANZAHL; i++) {
-        if (m === "harmonie") {
-          // Ein Gesetz für alle: der Zeiger wird vom Leitwinkel geführt
-          winkel[i] += (leitWinkel - winkel[i]) * 0.2;
-        } else if (m === "welt") {
-          winkel[i] += omega * gang[i] * dt;
-        } else {
-          // Lokale Angleichung an die Nachbarn, verzögert und unvollständig
-          const links = winkel[(i - 1 + ANZAHL) % ANZAHL];
-          const rechts = winkel[(i + 1) % ANZAHL];
-          const mittel = (links + rechts) / 2;
-          winkel[i] += omega * gang[i] * dt + (mittel - winkel[i]) * 0.04;
+        if (m === "harmonie") winkel[i] += (leit - winkel[i]) * 0.2;
+        else if (m === "welt") winkel[i] += omega * gang[i] * dt;
+        else {
+          const nb = (winkel[(i - 1 + ANZAHL) % ANZAHL] + winkel[(i + 1) % ANZAHL]) / 2;
+          winkel[i] += omega * gang[i] * dt + (nb - winkel[i]) * 0.04;
         }
       }
 
-      // Zeichnen
       const rect = canvas.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
       ctx.clearRect(0, 0, W, H);
+      const zeilen = Math.ceil(ANZAHL / SPALTEN);
+      const zelle = Math.min(W / SPALTEN, H / zeilen);
+      const r = zelle * 0.34;
+      const ox = (W - SPALTEN * zelle) / 2;
+      const oy = (H - zeilen * zelle) / 2;
 
-      const spalten = W < 500 ? 6 : 8;
-      const zeilen = Math.ceil(ANZAHL / spalten);
-      const zelle = Math.min(W / spalten, H / zeilen);
-      const r = zelle * 0.36;
-      const offX = (W - spalten * zelle) / 2;
-      const offY = (H - zeilen * zelle) / 2;
-
-      // Abweichung vom Mittel → Farbe
-      let sumSin = 0;
-      let sumCos = 0;
+      let ss = 0;
+      let sc = 0;
       for (let i = 0; i < ANZAHL; i++) {
-        sumSin += Math.sin(winkel[i]);
-        sumCos += Math.cos(winkel[i]);
+        ss += Math.sin(winkel[i]);
+        sc += Math.cos(winkel[i]);
       }
-      const mittelWinkel = Math.atan2(sumSin, sumCos);
+      const mittel = Math.atan2(ss, sc);
 
       for (let i = 0; i < ANZAHL; i++) {
-        const cx = offX + (i % spalten) * zelle + zelle / 2;
-        const cy = offY + Math.floor(i / spalten) * zelle + zelle / 2;
-        let diff = Math.abs(((winkel[i] - mittelWinkel + Math.PI) % (2 * Math.PI)) - Math.PI);
-        diff = Math.min(1, diff / Math.PI);
-        const hue = 240 - diff * 200; // blau = synchron, rot = abweichend
+        const cx = ox + (i % SPALTEN) * zelle + zelle / 2;
+        const cy = oy + Math.floor(i / SPALTEN) * zelle + zelle / 2;
+        const diff = Math.min(1, Math.abs(((winkel[i] - mittel + Math.PI * 3) % (Math.PI * 2)) - Math.PI) / Math.PI);
 
-        // Verbindung zum Nachbarn im Übersetzungsmodus
-        if (m === "uebersetzung" && i % spalten !== spalten - 1 && i + 1 < ANZAHL) {
+        if (m === "uebersetzung" && i % SPALTEN !== SPALTEN - 1) {
           ctx.beginPath();
-          ctx.moveTo(cx + r, cy);
-          ctx.lineTo(cx + zelle - r, cy);
-          ctx.strokeStyle = "rgba(255,255,255,0.12)";
-          ctx.lineWidth = 1;
+          ctx.moveTo(cx + r * 1.15, cy);
+          ctx.lineTo(cx + zelle - r * 1.15, cy);
+          ctx.strokeStyle = "rgba(230,224,212,0.12)";
+          ctx.lineWidth = 0.6;
           ctx.stroke();
         }
 
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.strokeStyle = `hsla(${hue}, 80%, 70%, 0.6)`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = "rgba(230,224,212,0.22)";
+        ctx.lineWidth = 0.8;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(winkel[i]) * r * 0.85, cy + Math.sin(winkel[i]) * r * 0.85);
-        ctx.strokeStyle = `hsla(${hue}, 90%, 80%, 0.95)`;
-        ctx.lineWidth = 2;
+        ctx.lineTo(cx + Math.cos(winkel[i]) * r * 0.82, cy + Math.sin(winkel[i]) * r * 0.82);
+        ctx.strokeStyle = `hsl(${40 - diff * 26}, ${15 + diff * 30}%, ${85 - diff * 23}%)`;
+        ctx.lineWidth = 1.4;
         ctx.lineCap = "round";
         ctx.stroke();
       }
-
       raf = requestAnimationFrame(schritt);
     };
     raf = requestAnimationFrame(schritt);
@@ -139,48 +127,28 @@ export default function Harmonie() {
     };
   }, []);
 
-  const knoepfe: { id: Modus; label: string; text: string }[] = [
-    {
-      id: "harmonie",
-      label: "Harmonie",
-      text: "Leibniz: Gott hat alle Uhren von Anfang an aufeinander abgestimmt. Ein Gesetz, eine Zeit.",
-    },
-    {
-      id: "welt",
-      label: "Welt",
-      text: "Ohne das eine Gesetz: Jede Uhr geht nach ihrem eigenen Gang. Nichts synchronisiert sie.",
-    },
-    {
-      id: "uebersetzung",
-      label: "Übersetzung",
-      text: "Latour: Uhren gleichen sich nur an ihre Nachbarn an — lokal, verzögert, mit Verlust. Synchronisation ist Arbeit, nie Zustand.",
-    },
-  ];
-
   return (
-    <div className="glass rounded-3xl p-4 sm:p-6">
-      <div className="flex flex-wrap gap-2 mb-4">
-        {knoepfe.map((k) => (
+    <div>
+      <canvas
+        ref={canvasRef}
+        className="h-[130px] w-full"
+        aria-label="Zwölf Uhren: synchronisiert, frei laufend oder lokal übersetzt"
+      />
+      <div className="mt-2 flex gap-4 text-[0.98rem] italic">
+        {MODI.map((k) => (
           <button
             key={k.id}
             onClick={() => setModus(k.id)}
-            className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
-              modus === k.id
-                ? "bg-white/15 text-white"
-                : "glass text-zinc-300 hover:bg-white/10"
+            className={`transition-colors ${
+              modus === k.id ? "text-[#ece6da]" : "text-[#6f6a61] hover:text-[#b5afa3]"
             }`}
           >
             {k.label}
           </button>
         ))}
       </div>
-      <canvas
-        ref={canvasRef}
-        className="w-full h-[260px] sm:h-[320px]"
-        aria-label="Viele Uhren: synchronisiert, frei laufend oder lokal übersetzt"
-      />
-      <p className="mt-4 text-sm text-zinc-400">
-        {knoepfe.find((k) => k.id === modus)?.text}
+      <p className="mt-1 font-sans text-[10px] tracking-[0.06em] text-[#6a655c]">
+        {MODI.find((k) => k.id === modus)?.text}
       </p>
     </div>
   );

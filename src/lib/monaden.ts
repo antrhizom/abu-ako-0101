@@ -24,24 +24,31 @@ export interface Monade {
   literatur?: string[];
   verbindungen?: string[];
   status?: Status;
+  /** Schlüssel in src/lib/zitate.ts — das Leibniz-Zitat im Innern der Monade */
+  zitat?: string;
+  /** Eingebettetes Element im Lesetext */
+  extra?: "harmonie";
   kinder?: Monade[];
 }
 
 export const welt: Monade = {
   id: "welt",
+  zitat: "§57",
   titel: "Die neue Unübersichtlichkeit",
   untertitel: "Positionen, die auf eine Welt antworten, die sich nicht berechnen lässt",
   hue: 250,
   these:
     "Leibniz versucht, eine Welt logisch zu ordnen, die sich logisch nicht ordnen lässt. Eine Welt kann nicht berechnet und nicht synchronisiert werden. Die Monaden hier sind Antworten darauf.",
   text: [
-    "Jede Monade enthält Monaden. Klicke hinein, um eine Position, ein Werk oder einen Begriff zu lesen. Oben kannst du die Ansicht wechseln: Dann werden die Monaden zu Ebenen, zu einem Netzwerk, zu Spurenlinien oder zu Falten.",
-    "Das Verzeichnis ist offen. Weitere Positionen lassen sich jederzeit aufnehmen.",
+    "Von aussen ist jede Monade geschlossen, ohne Fenster. Wer hineinzoomt, sieht ihre Welt: immer dieselbe Welt wie im Hintergrund, aber von ihrem Standpunkt aus, und nur in ihrer Nähe deutlich. Darin schweben weitere Monaden, ohne Ende.",
+    "Unten lassen sich die Monaden verwandeln: in eine Ebene (Foucaults Tableau), ein Netzwerk (Latour), eine Spur (Derrida) oder eine Falte (Deleuze).",
+    "Das Verzeichnis ist offen. Weitere Positionen lassen sich jederzeit aufnehmen. Die deutschen Leibniz-Zitate sind sinngemäss aus dem Französischen übersetzt.",
   ],
   kinder: [
     /* ---------------- Leibniz ---------------- */
     {
       id: "leibniz",
+      zitat: "§1",
       titel: "Monade",
       untertitel: "la monade",
       autor: "Gottfried Wilhelm Leibniz",
@@ -65,6 +72,7 @@ export const welt: Monade = {
       kinder: [
         {
           id: "monadologie",
+          zitat: "§14",
           titel: "Monadologie",
           autor: "Leibniz",
           jahr: 1714,
@@ -81,6 +89,7 @@ export const welt: Monade = {
         },
         {
           id: "discours",
+          zitat: "§22",
           titel: "Discours de métaphysique",
           autor: "Leibniz",
           jahr: 1686,
@@ -93,7 +102,24 @@ export const welt: Monade = {
           ],
         },
         {
+          id: "harmonie",
+          titel: "Prästabilierte Harmonie",
+          untertitel: "die zwei Uhren",
+          autor: "Leibniz",
+          jahr: 1695,
+          hue: 285,
+          status: "ausgearbeitet",
+          zitat: "§78",
+          extra: "harmonie",
+          these: "Zwei Uhren gehen vollkommen gleich, ohne einander zu beeinflussen — weil sie von Anfang an so gebaut wurden.",
+          text: [
+            "Wenn keine Monade ein Fenster hat, wie kommt es, dass alle dieselbe Welt sehen? Leibniz' Antwort im Système nouveau (1695): Gott hat alle Monaden vorab aufeinander abgestimmt, wie ein Uhrmacher zwei Uhren.",
+            "Das ist der Punkt. Das System hält nur, solange ein Dritter von aussen rechnet und synchronisiert. Nimmt man ihn weg, bleibt eine Welt aus geschlossenen Standpunkten, die sich nicht aufeinander abstimmen lassen. Probier es unten aus.",
+          ],
+        },
+        {
           id: "calculemus",
+          zitat: "§32",
           titel: "Calculemus",
           untertitel: "Characteristica universalis",
           autor: "Leibniz",
@@ -111,6 +137,7 @@ export const welt: Monade = {
     /* ---------------- Deleuze ---------------- */
     {
       id: "deleuze",
+      zitat: "§61b",
       titel: "Falte",
       untertitel: "le pli",
       autor: "Gilles Deleuze",
@@ -122,9 +149,10 @@ export const welt: Monade = {
         "Deleuze behält die fensterlose Monade und streicht die Garantie. Die Monade ist kein Spiegel der einen Welt, sondern eine Faltung: Das Aussen wird nach innen gebogen, und so entsteht ein Standpunkt.",
         "Perspektive heisst nicht, dass jeder seine eigene Wahrheit hat. Sie heisst, dass Wahrheit nur unter einer Bedingung erscheint, nämlich gefaltet. Was sich bei Leibniz ausschliesst (das Inkompossible), existiert heute in derselben Welt: Chaosmos statt Kosmos. Die Dissonanz wird nicht mehr aufgelöst.",
         "Gegen Leibniz: Die Berechnung scheitert nicht an zu wenig Rechenkraft. Sie scheitert daran, dass die Welt keine Summe von Standpunkten ist, sondern das, was zwischen ihnen passiert: das Ereignis.",
+        "Im Schlusskapitel deutet Deleuze an, dass aus der Monadologie eine Nomadologie wird: Die Monaden sind nicht mehr in sich geschlossen, sie ziehen umher und fangen einander ein. Darum schweben sie hier.",
       ],
       literatur: [
-        "Deleuze, Die Falte. Leibniz und der Barock (1988; dt. 1995).",
+        "Deleuze, Die Falte. Leibniz und der Barock (1988; dt. 1995), Kap. 9 «Die neue Harmonie».",
         "Deleuze, Foucault (1986; dt. 1987), Kap. «Die Faltungen».",
         "Deleuze, «Postskriptum über die Kontrollgesellschaften» (1990), in: Unterhandlungen.",
       ],
@@ -132,6 +160,7 @@ export const welt: Monade = {
       kinder: [
         {
           id: "die-falte",
+          zitat: "§67",
           titel: "Die Falte",
           untertitel: "Leibniz und der Barock",
           autor: "Deleuze",
@@ -177,6 +206,7 @@ export const welt: Monade = {
     /* ---------------- Derrida ---------------- */
     {
       id: "derrida",
+      zitat: "§61a",
       titel: "Spur",
       untertitel: "la trace",
       autor: "Jacques Derrida",
@@ -225,6 +255,7 @@ export const welt: Monade = {
     /* ---------------- Latour ---------------- */
     {
       id: "latour",
+      zitat: "§56",
       titel: "Netzwerk",
       untertitel: "le réseau",
       autor: "Bruno Latour · Akteur-Netzwerk-Theorie",
@@ -289,6 +320,7 @@ export const welt: Monade = {
     /* ---------------- Tarde ---------------- */
     {
       id: "tarde",
+      zitat: "§7",
       titel: "Monaden mit Fenstern",
       untertitel: "Monadologie et sociologie",
       autor: "Gabriel Tarde",
@@ -309,6 +341,7 @@ export const welt: Monade = {
     /* ---------------- Foucault ---------------- */
     {
       id: "foucault",
+      zitat: "§58",
       titel: "Tableau",
       untertitel: "le tableau",
       autor: "Michel Foucault",
@@ -351,6 +384,7 @@ export const welt: Monade = {
     /* ---------------- Habermas ---------------- */
     {
       id: "habermas",
+      zitat: "§69",
       titel: "Die neue Unübersichtlichkeit",
       autor: "Jürgen Habermas",
       jahr: 1985,
@@ -367,6 +401,7 @@ export const welt: Monade = {
     /* ---------------- Offen ---------------- */
     {
       id: "offen",
+      zitat: "§66",
       titel: "Weitere Monaden",
       untertitel: "noch aufzunehmen",
       hue: 60,
