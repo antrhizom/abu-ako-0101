@@ -62,7 +62,7 @@ export default async function Impressum() {
         <Abschnitt titel="Zweck">
           <p>
             Ein nichtkommerzielles Bildungsangebot. Die Seite führt in Positionen ein, die auf die Unübersichtlichkeit
-            der heutigen Welt antworten: Leibniz, Deleuze, Derrida, Latour, Foucault, Tarde und andere. Es gibt keine
+            der heutigen Welt antworten: Leibniz, Deleuze, Derrida, Latour, Foucault, Tarde, Sloterdijk und andere. Es gibt keine
             Werbung, keine Anmeldung und keine Bezahlfunktion.
           </p>
         </Abschnitt>
@@ -139,7 +139,7 @@ export default async function Impressum() {
             Original wird wörtlich wiedergegeben, die deutschen Fassungen sind eigene, sinngemässe Übersetzungen.
           </p>
           <p>
-            Die Darstellungen zu Deleuze, Derrida, Latour, Foucault, Tarde und Habermas sind eigene Zusammenfassungen.
+            Die Darstellungen zu Deleuze, Derrida, Latour, Foucault, Tarde, Sloterdijk und Habermas sind eigene Zusammenfassungen, ebenso die Beispiele aus dem Leben im Rundgang.
             Ihre Werke sind urheberrechtlich geschützt; sie werden hier nicht abgedruckt, sondern beschrieben und mit
             Quellenangabe nachgewiesen. Wenige kurze Wendungen sind als Zitat gekennzeichnet (Art. 25 URG). Die
             Literaturangaben sind ohne Gewähr; massgeblich sind die Originalausgaben.
