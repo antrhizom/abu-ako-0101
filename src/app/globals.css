@@ -141,3 +141,23 @@ body::after {
 .glow-amber { box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 .glow-blue { box-shadow: 0 0 60px rgba(96, 165, 250, 0.15); }
 .glow-emerald { box-shadow: 0 0 60px rgba(52, 211, 153, 0.15); }
+
+/* --- pli · trace · réseau · monade --- */
+.font-monade {
+  font-family: var(--font-serif), "Iowan Old Style", Palatino, Georgia, serif;
+}
+
+@keyframes mr-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mr-fade { animation: mr-fade 1.1s ease both; }
+
+.font-monade ::-webkit-scrollbar { width: 3px; }
+.font-monade ::-webkit-scrollbar-thumb { background: rgba(43, 39, 35, 0.15); }
+.font-monade * { scrollbar-width: thin; scrollbar-color: rgba(43, 39, 35, 0.15) transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mr-fade { animation: none; }
+}
