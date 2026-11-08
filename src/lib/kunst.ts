@@ -63,6 +63,11 @@ export const KUNST: KunstEintrag[] = [
     bezug: "Unübersichtlichkeit: Räume, die sich nicht überblicken lassen.",
   },
   {
+    monade: "sloterdijk",
+    metId: 435888,
+    bezug: "Eine Seifenblase: zerbrechlich, schützend, für einen Moment eine eigene Welt.",
+  },
+  {
     monade: "offen",
     metId: 435809,
     bezug: "Eine Welt voller Geschöpfe im Kleinsten — Monadologie §66.",

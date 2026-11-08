@@ -398,10 +398,79 @@ export const welt: Monade = {
       verbindungen: ["deleuze", "derrida", "latour"],
     },
 
+    /* ---------------- Sloterdijk ---------------- */
+    {
+      id: "sloterdijk",
+      zitat: "§66",
+      titel: "Schaum",
+      untertitel: "Blasen, Globen, Schäume",
+      autor: "Peter Sloterdijk",
+      jahr: 2004,
+      hue: 120,
+      status: "ausgearbeitet",
+      these:
+        "Monaden sind Blasen, und Blasen sind Immunsysteme. Niemand lebt allein in seiner Blase: Heute bilden sie einen Schaum, viele Blasen, die Wände teilen.",
+      text: [
+        "Sloterdijk erzählt in der Trilogie «Sphären» die Geschichte der Innenräume, in denen Menschen leben. Menschen sind nie einfach im Freien. Sie leben in Sphären, die sie gemeinsam bilden und die sie schützen, wie ein Immunsystem.",
+        "Blasen (1998) sind die kleinen, intimen Sphären zu zweit. Globen (1999) ist die eine grosse Weltkugel, die alles umfasst: der geordnete Kosmos, der Gott, die Harmonie. Diese grosse Kugel ist zerbrochen, so wie Leibniz' prästabilierte Harmonie. Schäume (2004) beschreibt, was bleibt: viele Blasen, die aneinanderstossen und Wände teilen.",
+        "Er nennt das Ko-Isolation. Jede Blase ist für sich, und doch hängt sie über gemeinsame Wände mit den Nachbarn zusammen. So gelesen ist der Schaum eine Monadologie, in der die Monaden zwar keine Fenster haben, aber Wände teilen.",
+        "Für das Leben heisst das: Man braucht eine Blase, um nicht ungeschützt ins Unübersichtliche zu fallen. Aber eine Blase ohne gemeinsame Wände wird zur Isolation. Ein gutes Immunsystem schützt, ohne abzuschotten.",
+      ],
+      literatur: [
+        "Sloterdijk, Sphären I: Blasen (1998).",
+        "Sloterdijk, Sphären II: Globen (1999).",
+        "Sloterdijk, Sphären III: Schäume (2004).",
+        "Sloterdijk, Du musst dein Leben ändern (2009) — zu Immunsystemen und Übungen.",
+      ],
+      verbindungen: ["leibniz", "tarde", "latour"],
+      kinder: [
+        {
+          id: "blasen",
+          titel: "Blasen",
+          untertitel: "Sphären I",
+          autor: "Sloterdijk",
+          jahr: 1998,
+          hue: 115,
+          status: "skizze",
+          these: "Die erste Sphäre ist zu zweit: Mutter und Kind, Liebende, Freunde. Niemand beginnt allein.",
+        },
+        {
+          id: "globen",
+          titel: "Globen",
+          untertitel: "Sphären II",
+          autor: "Sloterdijk",
+          jahr: 1999,
+          hue: 125,
+          status: "skizze",
+          these: "Die grosse Kugel, die alles umfasst: der Kosmos, Gott, die Harmonie. Sie ist zerbrochen.",
+        },
+        {
+          id: "schaeume",
+          titel: "Schäume",
+          untertitel: "Sphären III",
+          autor: "Sloterdijk",
+          jahr: 2004,
+          hue: 120,
+          status: "skizze",
+          these: "Viele Blasen, die Wände teilen: Ko-Isolation statt Harmonie.",
+        },
+        {
+          id: "immunsysteme",
+          titel: "Immunsysteme",
+          untertitel: "Du musst dein Leben ändern",
+          autor: "Sloterdijk",
+          jahr: 2009,
+          hue: 110,
+          status: "skizze",
+          these: "Menschen schützen sich nicht nur biologisch, sondern auch sozial und symbolisch: durch Übungen, Rituale, gemeinsame Bilder.",
+        },
+      ],
+    },
+
     /* ---------------- Offen ---------------- */
     {
       id: "offen",
-      zitat: "§66",
+      zitat: "§14",
       titel: "Weitere Monaden",
       untertitel: "noch aufzunehmen",
       hue: 60,
@@ -422,14 +491,14 @@ export const welt: Monade = {
           these: "Zeit wie ein Taschentuch: Weit Entferntes rückt zusammen. Latours Quelle für die Falte in der Technik.",
         },
         {
-          id: "sloterdijk",
-          titel: "Sloterdijk",
-          untertitel: "Sphären",
-          autor: "Peter Sloterdijk",
-          jahr: 1998,
+          id: "merleau-ponty",
+          titel: "Merleau-Ponty",
+          untertitel: "Das Fleisch der Welt",
+          autor: "Maurice Merleau-Ponty",
+          jahr: 1964,
           hue: 80,
           status: "offen",
-          these: "Blasen, Globen, Schäume: Monaden als bewohnte Innenräume.",
+          these: "Die Tiefe ist die erste Dimension. Der sehende Leib ist selbst sichtbar; die Welt faltet sich in ihm auf sich zurück.",
         },
         {
           id: "haraway",
@@ -466,4 +535,17 @@ export function alleMonaden(
   acc.push({ m, eltern, tiefe });
   for (const k of m.kinder ?? []) alleMonaden(k, m, acc, tiefe + 1);
   return acc;
+}
+
+/** Monaden entlang einer Kette von IDs, beginnend bei "welt" */
+export function pfadAus(ids: string[]): Monade[] {
+  const out: Monade[] = [welt];
+  let m = welt;
+  for (const id of ids.slice(1)) {
+    const k = m.kinder?.find((c) => c.id === id);
+    if (!k) break;
+    out.push(k);
+    m = k;
+  }
+  return out;
 }

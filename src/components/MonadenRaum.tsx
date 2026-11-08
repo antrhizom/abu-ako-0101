@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { welt, type Monade } from "@/lib/monaden";
+import { welt, pfadAus, type Monade } from "@/lib/monaden";
+import { STATIONEN, type Beispiel, type Modus } from "@/lib/rundgang";
 import { zitatFuer } from "@/lib/zitate";
 import Harmonie from "@/components/Harmonie";
 import type { Kunstwerk } from "@/lib/kunst";
@@ -18,7 +19,7 @@ import type { Kunstwerk } from "@/lib/kunst";
  * Bildschirm füllt; so bleibt der Zoom beliebig tief rechengenau.
  */
 
-export type Modus = "monade" | "ebene" | "reseau" | "trace" | "pli";
+export type { Modus };
 
 const MODI: { id: Modus; label: string; text: string }[] = [
   { id: "monade", label: "monade", text: "Leibniz — geschlossen, ohne Fenster, jede mit eigener Perspektive" },
@@ -26,6 +27,7 @@ const MODI: { id: Modus; label: string; text: string }[] = [
   { id: "reseau", label: "réseau", text: "Latour — Monaden mit Fenstern: was zusammenhängt, wurde verbunden" },
   { id: "trace", label: "trace", text: "Derrida — eine Linie durch die Zeit: jede Position verweist auf andere" },
   { id: "pli", label: "pli", text: "Deleuze — dieselbe Fläche, gefaltet: was fern ist, berührt sich im Knick" },
+  { id: "schaum", label: "schaum", text: "Sloterdijk — Blasen, die Wände teilen: niemand ist allein in seiner Blase" },
 ];
 
 interface Knoten {
@@ -212,6 +214,20 @@ function phasenVon(seed: number): Phasen {
   return ph;
 }
 
+/* ---------------- Rundgang: Beispiel aus dem Leben ---------------- */
+
+function BeispielKarte({ b }: { b: Beispiel }) {
+  return (
+    <div className="text-[0.95rem] leading-[1.5]">
+      <p className="text-[#6d665c]">{b.situation}</p>
+      <p className="mt-1 text-[#2b2723]">
+        <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-[#857d71]">anders · </span>
+        {b.anders}
+      </p>
+    </div>
+  );
+}
+
 /* ---------------- Komponente ---------------- */
 
 export default function MonadenRaum({
@@ -230,6 +246,32 @@ export default function MonadenRaum({
   const [lesen, setLesen] = useState(false);
   const [hinweis, setHinweis] = useState(true);
   const steuer = useRef<{ fliegeZu: (abs: Knoten[]) => void }>({ fliegeZu: () => {} });
+  const [station, setStation] = useState<number | null>(0);
+  // Auf dem Handy zeigt die Karte zuerst nur Frage und Klärung
+  const [mehr, setMehr] = useState(false);
+  const antwortRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
+
+  // Zu Beginn: zuerst die ganze Welt zeigen, dann in die erste Station hinein
+  useEffect(() => {
+    const id = window.setTimeout(
+      () => steuer.current.fliegeZu(pfadAus(STATIONEN[0].pfad).map(ausMonade)),
+      2200
+    );
+    return () => window.clearTimeout(id);
+  }, []);
+
+  // Notizen der letzten Station: nur auf diesem Gerät
+  useEffect(() => {
+    if (station === null || !STATIONEN[station].fragen) return;
+    antwortRefs.current.forEach((el, i) => {
+      if (!el) return;
+      try {
+        el.value = window.localStorage.getItem(`monade-antwort-${i}`) ?? "";
+      } catch {
+        /* Speicher nicht verfügbar */
+      }
+    });
+  }, [station]);
 
   useEffect(() => {
     modusRef.current = modus;
@@ -291,7 +333,7 @@ export default function MonadenRaum({
 
     // Freie Fläche für die Monaden der Welt (Pixel): neben Lesespalte und Bedienung
     const nutzflaeche = () =>
-      W < 640 ? { l: 40, r: W - 40, o: 72, u: H - 235 } : { l: 40, r: W - 420, o: 90, u: H - 120 };
+      W < 640 ? { l: 40, r: W - 40, o: 72, u: H - 300 } : { l: 40, r: W - 420, o: 90, u: H - 120 };
 
     const boxVon = (k: Knoten): Box => {
       if (k.key === "welt") {
@@ -398,6 +440,32 @@ export default function MonadenRaum({
           r: cell * 0.3,
         }));
       }
+      if (m === "schaum") {
+        // Dichte Packung auf einem Sechseckgitter: Die Blasen stossen aneinander und teilen Wände
+        const pos: [number, number][] = [[0, 0]];
+        for (let ring = 1; pos.length < n; ring++) {
+          for (let seite = 0; seite < 6; seite++) {
+            const a0 = (seite * Math.PI) / 3;
+            const a1 = ((seite + 1) * Math.PI) / 3;
+            for (let schrittI = 0; schrittI < ring; schrittI++) {
+              pos.push([
+                ring * Math.cos(a0) + schrittI * (Math.cos(a1) - Math.cos(a0)),
+                ring * Math.sin(a0) + schrittI * (Math.sin(a1) - Math.sin(a0)),
+              ]);
+            }
+          }
+        }
+        const R0 = 0.62;
+        const p = pos.slice(0, n);
+        const ex = Math.max(...p.map(([x]) => Math.abs(x))) + R0;
+        const ey = Math.max(...p.map(([, y]) => Math.abs(y))) + R0;
+        const k = Math.min((box.hx * 0.92) / ex, (box.hy * 0.92) / ey);
+        return kinder.map((c, i) => ({
+          x: box.ox + p[i][0] * k,
+          y: box.oy + p[i][1] * k,
+          r: R0 * k * (0.94 + 0.12 * ((hash(c.key) % 100) / 100)),
+        }));
+      }
       if (m === "trace" || m === "pli") {
         const out = new Array<Kreis>(n);
         const w = box.hx * 0.84;
@@ -462,7 +530,9 @@ export default function MonadenRaum({
       const ziele = m === "monade" ? lagenMonade(k, kinder, box) : lagenModus(m, k, kinder, box);
       const mn = Math.min(box.hx, box.hy);
       const amp =
-        (m === "ebene" ? 0 : m === "trace" || m === "pli" ? 0.006 : 0.03) * (mn / 0.6) * (ruhig ? 0.25 : 1);
+        (m === "ebene" ? 0 : m === "schaum" ? 0.004 : m === "trace" || m === "pli" ? 0.006 : 0.03) *
+        (mn / 0.6) *
+        (ruhig ? 0.25 : 1);
       const out = kinder.map((c, i) => {
         const id = k.key + ">" + c.key;
         const z = ziele[i];
@@ -610,6 +680,12 @@ export default function MonadenRaum({
       ctx.strokeStyle = `hsla(${h}, 22%, 30%, ${(hover ? 0.5 : 0.22) * a})`;
       ctx.stroke();
       ctx.setLineDash([]);
+      // Membran: die Hülle als Immunsystem
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 0.93, 0, Math.PI * 2);
+      ctx.lineWidth = 0.6;
+      ctx.strokeStyle = `hsla(${h}, 25%, 35%, ${0.12 * a})`;
+      ctx.stroke();
       // Glanzlicht
       if (s.r > 6) {
         ctx.beginPath();
@@ -789,6 +865,28 @@ export default function MonadenRaum({
         ctx.fill();
       }
 
+      const schaum = fokussiert && modusRef.current === "schaum";
+      // Die Hälfte jenseits der gemeinsamen Wand mit einer Nachbarblase abschneiden
+      const schaumSchnitt = (a: Kreis, b: Kreis) => {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const d = Math.hypot(dx, dy);
+        if (d >= a.r + b.r || d < 1e-6) return;
+        const ux = dx / d;
+        const uy = dy / d;
+        const w = (d * d + a.r * a.r - b.r * b.r) / (2 * d);
+        const px = a.x + ux * w;
+        const py = a.y + uy * w;
+        const L = (a.r + b.r) * 4;
+        ctx.beginPath();
+        ctx.moveTo(px - uy * L, py + ux * L);
+        ctx.lineTo(px + uy * L, py - ux * L);
+        ctx.lineTo(px + uy * L - ux * L, py - ux * L - uy * L);
+        ctx.lineTo(px - uy * L - ux * L, py + ux * L - uy * L);
+        ctx.closePath();
+        ctx.clip();
+      };
+
       kinder.forEach((c, i) => {
         const s = scr[i];
         if (s.r < 1.2) return;
@@ -809,10 +907,50 @@ export default function MonadenRaum({
           ctx.strokeStyle = `hsla(${c.hue}, 20%, 32%, ${0.24 * o * alpha})`;
           ctx.stroke();
         }
-        if (o < 0.99) zeichneHuelle(c, s, (1 - o) * alpha, hover);
+        if (o < 0.99) {
+          if (schaum) {
+            ctx.save();
+            scr.forEach((q, j) => {
+              if (j !== i) schaumSchnitt(s, q);
+            });
+            zeichneHuelle(c, s, (1 - o) * alpha, hover);
+            ctx.restore();
+          } else zeichneHuelle(c, s, (1 - o) * alpha, hover);
+        }
         if (alpha > 0.25) treffer.push({ ...s, rel: relC, o });
         if (fokussiert && c.m && o < 0.6 && s.r > 5) labels.push({ c, s, a: (1 - o) * alpha, hover });
       });
+
+      if (schaum) {
+        // Gemeinsame Wände: Ko-Isolation
+        for (let a = 0; a < scr.length; a++)
+          for (let b = a + 1; b < scr.length; b++) {
+            const A = scr[a];
+            const B = scr[b];
+            const dx = B.x - A.x;
+            const dy = B.y - A.y;
+            const d = Math.hypot(dx, dy);
+            if (d >= A.r + B.r || d < 1e-6) continue;
+            const ux = dx / d;
+            const uy = dy / d;
+            const w = (d * d + A.r * A.r - B.r * B.r) / (2 * d);
+            const hh = Math.sqrt(Math.max(0, A.r * A.r - w * w));
+            const px = A.x + ux * w;
+            const py = A.y + uy * w;
+            for (const [lw, al] of [
+              [4, 0.07],
+              [1.1, 0.4],
+            ]) {
+              ctx.beginPath();
+              ctx.moveTo(px - uy * hh, py + ux * hh);
+              ctx.lineTo(px + uy * hh, py - ux * hh);
+              ctx.lineWidth = lw;
+              ctx.lineCap = "round";
+              ctx.strokeStyle = `hsla(30, 15%, 28%, ${al * alpha})`;
+              ctx.stroke();
+            }
+          }
+      }
     };
 
     const zeichneLabels = (labels: Label[]) => {
@@ -823,7 +961,7 @@ export default function MonadenRaum({
         ctx.font = `400 ${fs}px ${serif}`;
         ctxLs.letterSpacing = "0px";
         ctx.fillStyle = `hsla(30, 15%, 16%, ${(hover ? 0.95 : 0.8) * a})`;
-        const y = s.y + s.r + 9;
+        const y = modusRef.current === "schaum" ? s.y - fs * 0.7 : s.y + s.r + 9;
         ctx.fillText(c.m!.titel, s.x, y);
         const zweite = modusRef.current === "trace" && c.jahr ? String(c.jahr) : c.m!.autor?.split(" ·")[0];
         if (zweite && (W >= 640 || hover)) {
@@ -1091,6 +1229,14 @@ export default function MonadenRaum({
       ];
 
   const fliege = (abs: Knoten[]) => steuer.current.fliegeZu(abs);
+  const geheZu = (i: number) => {
+    const ziel = STATIONEN[i];
+    setStation(i);
+    setMehr(false);
+    setModus(ziel.modus ?? "monade");
+    fliege(pfadAus(ziel.pfad).map(ausMonade));
+  };
+  const st = station !== null ? STATIONEN[station] : null;
   const bild = kunst.find((b) => b.monade === knoten.key);
   const impressum = standalone ? "/impressum" : "/pli-trace-reseau-monade/impressum";
 
@@ -1114,6 +1260,14 @@ export default function MonadenRaum({
       {/* Kopf */}
       <header className="absolute left-5 top-5 flex items-baseline gap-4 sm:left-8 sm:top-7">
         <h1 className="text-[15px] tracking-[0.22em] text-[#5c564d]">pli · trace · réseau · monade</h1>
+        {station === null && (
+          <button
+            onClick={() => geheZu(0)}
+            className="font-sans text-[10px] uppercase tracking-[0.18em] text-[#857d71] transition-colors hover:text-[#1f1c19]"
+          >
+            Rundgang
+          </button>
+        )}
         {!standalone && (
           <Link
             href="/"
@@ -1143,107 +1297,258 @@ export default function MonadenRaum({
         </figure>
       )}
 
-      {/* Lesefeld */}
-      <aside
-        key={"a" + knoten.key}
-        className="mr-fade absolute inset-x-4 bottom-[4.25rem] max-h-[60vh] overflow-y-auto rounded-sm border-t border-black/5 bg-[#f1ece3]/92 px-4 py-3 sm:inset-x-auto sm:bottom-auto sm:right-8 sm:top-7 sm:max-h-[calc(100vh-9rem)] sm:w-[22rem] sm:border-0 sm:bg-transparent sm:p-0"
-      >
-        <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71]">{kicker}</div>
-        <h2 className="mt-1.5 text-[1.5rem] font-light leading-[1.1] text-[#1f1c19] sm:mt-2 sm:text-[2.3rem]">{titel}</h2>
-        {m?.untertitel && (
-          <div className="mt-1 hidden text-[1.05rem] italic text-[#7a7368] sm:block">{m.untertitel}</div>
-        )}
-        {these && (
-          <p
-            className={`mt-2 text-[1rem] leading-[1.5] text-[#3a352f] sm:mt-4 sm:line-clamp-none sm:text-[1.08rem] ${
-              lesen ? "" : "line-clamp-2"
-            }`}
-          >
-            {these}
-          </p>
-        )}
-
-        {tiefe === 0 && (
-          <figure className={`group mt-6 border-l border-black/10 pl-4 sm:block ${lesen ? "block" : "hidden"}`}>
-            <blockquote className="text-[1.02rem] font-light italic leading-[1.55] text-[#2b2723]/85">
-              «{zitat.de}»
-            </blockquote>
-            <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.82rem] italic leading-[1.45] text-[#857d71] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
-              {zitat.fr}
-            </p>
-            <figcaption className="mt-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">
-              Leibniz, {zitat.ref}
-              <span className="hidden sm:inline"> · fr ↑</span>
-            </figcaption>
-          </figure>
-        )}
-
-        <button
-          onClick={() => setLesen((v) => !v)}
-          className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] transition-colors hover:text-[#1f1c19] sm:mt-4"
+      {/* Rundgang */}
+      {st && station !== null && (
+        <aside
+          key={"s" + st.id}
+          className="mr-fade absolute inset-x-4 bottom-[4.25rem] max-h-[58vh] overflow-y-auto rounded-sm border-t border-black/5 bg-[#f1ece3]/95 px-4 py-3 sm:inset-x-auto sm:bottom-auto sm:right-8 sm:top-6 sm:max-h-[calc(100vh-8.5rem)] sm:w-[24rem] sm:border-0 sm:bg-[#f1ece3]/85 sm:px-5 sm:py-4"
         >
-          {lesen ? "– weniger" : "+ lesen"}
-        </button>
+          <div className="flex items-center justify-between font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71]">
+            <span>
+              Rundgang · {station + 1} / {STATIONEN.length}
+            </span>
+            <button onClick={() => setStation(null)} className="transition-colors hover:text-[#1f1c19]">
+              freier Raum ×
+            </button>
+          </div>
+          <div className="mt-2 flex gap-1.5">
+            {STATIONEN.map((x, i) => (
+              <button
+                key={x.id}
+                aria-label={`Station ${i + 1}: ${x.titel}`}
+                title={x.titel}
+                onClick={() => geheZu(i)}
+                className={`h-1 flex-1 rounded-full transition-colors ${
+                  i === station ? "bg-[#2b2723]/70" : i < station ? "bg-[#2b2723]/30" : "bg-[#2b2723]/10"
+                }`}
+              />
+            ))}
+          </div>
 
-        {lesen && (
-          <div className="mr-fade mt-4 space-y-3 pb-2">
-            {text?.map((p, i) => (
-              <p key={i} className="text-[1rem] leading-[1.6] text-[#4a443d]">
+          <h2 className="mt-4 text-[1.6rem] font-light leading-[1.1] text-[#1f1c19] sm:text-[2.1rem]">{st.titel}</h2>
+          <p className="mt-2 text-[1.05rem] italic leading-[1.45] text-[#6d665c]">{st.frage}</p>
+          <p className="mt-3 border-l-2 border-[#2b2723]/25 pl-3 text-[1.08rem] leading-[1.5] text-[#2b2723]">
+            {st.klaerung}
+          </p>
+          <button
+            onClick={() => setMehr((v) => !v)}
+            className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] sm:hidden"
+          >
+            {mehr ? "– weniger" : "+ mehr: Erklärung und Beispiele"}
+          </button>
+
+          <div className={mehr ? "" : "hidden sm:block"}>
+            {st.text.map((p, i) => (
+              <p key={i} className="mt-3 text-[0.98rem] leading-[1.6] text-[#4a443d]">
                 {p}
               </p>
             ))}
-            {m?.extra === "harmonie" && (
-              <div className="pt-2">
+  
+            {st.extra === "harmonie" && (
+              <div className="mt-4">
                 <Harmonie />
               </div>
             )}
-            {m?.literatur && m.literatur.length > 0 && (
-              <div className="pt-3">
-                <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Literatur</div>
-                <ul className="mt-2 space-y-1.5 text-[0.85rem] leading-[1.45] text-[#857d71]">
-                  {m.literatur.map((l) => (
-                    <li key={l}>{l}</li>
-                  ))}
-                </ul>
+  
+            {st.antworten && (
+              <div className="mt-4 space-y-3">
+                {st.antworten.map((a) => (
+                  <div
+                    key={a.modus}
+                    className={`rounded-sm border px-3 py-2.5 transition-colors ${
+                      modus === a.modus ? "border-[#2b2723]/30 bg-white/40" : "border-black/10"
+                    }`}
+                  >
+                    <button
+                      onClick={() => setModus(a.modus)}
+                      className="flex w-full items-baseline justify-between gap-3 text-left"
+                    >
+                      <span className="text-[1.2rem] italic text-[#1f1c19]">{a.wort}</span>
+                      <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-[#857d71]">{a.autor}</span>
+                    </button>
+                    <p className="mt-1 text-[0.95rem] leading-[1.5] text-[#3a352f]">{a.satz}</p>
+                    <div className="mt-2">
+                      <BeispielKarte b={a.beispiel} />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
+  
+            {st.beispiele.length > 0 && (
+              <div className="mt-5">
+                <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71]">Im Leben</div>
+                <div className="mt-2 space-y-3">
+                  {st.beispiele.map((b) => (
+                    <BeispielKarte key={b.situation} b={b} />
+                  ))}
+                </div>
+              </div>
+            )}
+  
+            {st.fragen && (
+              <div className="mt-4 space-y-4">
+                {st.fragen.map((f, i) => (
+                  <label key={f.frage} className="block">
+                    <span className="block text-[1.1rem] leading-[1.35] text-[#1f1c19]">{f.frage}</span>
+                    <span className="mt-0.5 block text-[0.9rem] italic text-[#857d71]">{f.hilfe}</span>
+                    <textarea
+                      ref={(el) => {
+                        antwortRefs.current[i] = el;
+                      }}
+                      rows={2}
+                      onChange={(e) => {
+                        try {
+                          window.localStorage.setItem(`monade-antwort-${i}`, e.target.value);
+                        } catch {
+                          /* Speicher nicht verfügbar */
+                        }
+                      }}
+                      className="mt-2 w-full resize-y rounded-sm border border-black/10 bg-white/50 px-2.5 py-2 font-sans text-[0.9rem] text-[#2b2723] outline-none focus:border-[#2b2723]/40"
+                    />
+                  </label>
+                ))}
+              </div>
+            )}
+  
           </div>
-        )}
 
-        {m?.kinder && m.kinder.length > 0 && (
-          <div className="mt-5 hidden sm:block">
-            <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">enthält</div>
-            <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[0.98rem] italic">
-              {m.kinder.map((k) => (
-                <button
-                  key={k.id}
-                  onClick={() => fliege([...fokus, ausMonade(k)])}
-                  className="text-[#6d665c] transition-colors hover:text-[#1f1c19]"
-                >
-                  {k.titel}
-                </button>
-              ))}
-            </div>
+          {st.sprung && (
+            <button
+              onClick={() => fliege(pfadAus(st.sprung!.pfad).map(ausMonade))}
+              className="mt-4 font-sans text-[10px] uppercase tracking-[0.2em] text-[#6d665c] underline-offset-4 transition-colors hover:text-[#1f1c19] hover:underline"
+            >
+              {st.sprung.label} →
+            </button>
+          )}
+
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-black/10 pt-3 font-sans text-[10px] uppercase tracking-[0.18em]">
+            <button
+              disabled={station === 0}
+              onClick={() => geheZu(station - 1)}
+              className="text-[#857d71] transition-colors hover:text-[#1f1c19] disabled:opacity-30"
+            >
+              ← zurück
+            </button>
+            {station < STATIONEN.length - 1 ? (
+              <button
+                onClick={() => geheZu(station + 1)}
+                className="text-right text-[#1f1c19] transition-opacity hover:opacity-70"
+              >
+                weiter: {STATIONEN[station + 1].titel} →
+              </button>
+            ) : (
+              <button onClick={() => setStation(null)} className="text-[#1f1c19] transition-opacity hover:opacity-70">
+                frei weiter erkunden →
+              </button>
+            )}
           </div>
-        )}
-        {bild && (
-          <p className="mt-5 font-sans text-[10px] leading-[1.5] tracking-[0.04em] text-[#9a9286]">
-            Bild:{" "}
-            <a href={bild.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
-              {bild.kuenstler ? `${bild.kuenstler}, ` : ""}
-              {bild.titel}
-              {bild.datum ? ` (${bild.datum})` : ""}
-            </a>
-            . The Met, Open Access, gemeinfrei (CC0).
-          </p>
-        )}
-        <Link
-          href={impressum}
-          className="mt-3 block font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286] sm:hidden"
+        </aside>
+      )}
+
+      {/* Lesefeld */}
+      {!st && (
+        <aside
+          key={"a" + knoten.key}
+          className="mr-fade absolute inset-x-4 bottom-[4.25rem] max-h-[60vh] overflow-y-auto rounded-sm border-t border-black/5 bg-[#f1ece3]/92 px-4 py-3 sm:inset-x-auto sm:bottom-auto sm:right-8 sm:top-7 sm:max-h-[calc(100vh-9rem)] sm:w-[22rem] sm:border-0 sm:bg-transparent sm:p-0"
         >
-          Impressum
-        </Link>
-      </aside>
+          <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71]">{kicker}</div>
+          <h2 className="mt-1.5 text-[1.5rem] font-light leading-[1.1] text-[#1f1c19] sm:mt-2 sm:text-[2.3rem]">{titel}</h2>
+          {m?.untertitel && (
+            <div className="mt-1 hidden text-[1.05rem] italic text-[#7a7368] sm:block">{m.untertitel}</div>
+          )}
+          {these && (
+            <p
+              className={`mt-2 text-[1rem] leading-[1.5] text-[#3a352f] sm:mt-4 sm:line-clamp-none sm:text-[1.08rem] ${
+                lesen ? "" : "line-clamp-2"
+              }`}
+            >
+              {these}
+            </p>
+          )}
+  
+          {tiefe === 0 && (
+            <figure className={`group mt-6 border-l border-black/10 pl-4 sm:block ${lesen ? "block" : "hidden"}`}>
+              <blockquote className="text-[1.02rem] font-light italic leading-[1.55] text-[#2b2723]/85">
+                «{zitat.de}»
+              </blockquote>
+              <p className="mt-2 hidden max-h-0 overflow-hidden text-[0.82rem] italic leading-[1.45] text-[#857d71] opacity-0 transition-all duration-700 group-hover:max-h-60 group-hover:opacity-100 sm:block">
+                {zitat.fr}
+              </p>
+              <figcaption className="mt-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">
+                Leibniz, {zitat.ref}
+                <span className="hidden sm:inline"> · fr ↑</span>
+              </figcaption>
+            </figure>
+          )}
+  
+          <button
+            onClick={() => setLesen((v) => !v)}
+            className="mt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#857d71] transition-colors hover:text-[#1f1c19] sm:mt-4"
+          >
+            {lesen ? "– weniger" : "+ lesen"}
+          </button>
+  
+          {lesen && (
+            <div className="mr-fade mt-4 space-y-3 pb-2">
+              {text?.map((p, i) => (
+                <p key={i} className="text-[1rem] leading-[1.6] text-[#4a443d]">
+                  {p}
+                </p>
+              ))}
+              {m?.extra === "harmonie" && (
+                <div className="pt-2">
+                  <Harmonie />
+                </div>
+              )}
+              {m?.literatur && m.literatur.length > 0 && (
+                <div className="pt-3">
+                  <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Literatur</div>
+                  <ul className="mt-2 space-y-1.5 text-[0.85rem] leading-[1.45] text-[#857d71]">
+                    {m.literatur.map((l) => (
+                      <li key={l}>{l}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+  
+          {m?.kinder && m.kinder.length > 0 && (
+            <div className="mt-5 hidden sm:block">
+              <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">enthält</div>
+              <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[0.98rem] italic">
+                {m.kinder.map((k) => (
+                  <button
+                    key={k.id}
+                    onClick={() => fliege([...fokus, ausMonade(k)])}
+                    className="text-[#6d665c] transition-colors hover:text-[#1f1c19]"
+                  >
+                    {k.titel}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {bild && (
+            <p className="mt-5 font-sans text-[10px] leading-[1.5] tracking-[0.04em] text-[#9a9286]">
+              Bild:{" "}
+              <a href={bild.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
+                {bild.kuenstler ? `${bild.kuenstler}, ` : ""}
+                {bild.titel}
+                {bild.datum ? ` (${bild.datum})` : ""}
+              </a>
+              . The Met, Open Access, gemeinfrei (CC0).
+            </p>
+          )}
+          <Link
+            href={impressum}
+            className="mt-3 block font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286] sm:hidden"
+          >
+            Impressum
+          </Link>
+        </aside>
+      )}
 
       <Link
         href={impressum}
