@@ -1,29 +1,33 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
-import MonadenRaum from "@/components/MonadenRaum";
-import { ladeKunst } from "@/lib/kunst";
+import Kabinett, { type Exponat } from "@/components/Kabinett";
+import { KABINETT, kabinettIds } from "@/lib/kabinett";
+import { ladeWerke } from "@/lib/kunst";
 import { cormorant } from "./schrift";
+import { standort } from "./standort";
 
 export const metadata: Metadata = {
   title: "pli · trace · réseau · monade",
   description:
-    "Schwebende Monaden zum Hineinzoomen: Leibniz will eine Welt berechnen und synchronisieren, die sich weder berechnen noch synchronisieren lässt. Falte, Spur und Netzwerk antworten darauf.",
+    "Ein Kabinett aus Bildern der Zeit um 1700, jedes mit einer Frage. Schau, rate, wandere. Die Erklärungen folgen im Lehrgang.",
 };
 
 export const viewport: Viewport = {
   themeColor: "#f1ece3",
 };
 
-export default async function PliTraceReseauMonade() {
-  // Unter pli-trace-reseau-monade.vercel.app eigenständig: keine Links zur ABU-Seite
-  const host = (await headers()).get("host") ?? "";
-  const standalone =
-    host.startsWith("pli-trace-reseau-monade") || process.env.NEXT_PUBLIC_SITE === "pli-trace-reseau-monade";
-  const kunst = await ladeKunst();
+export default async function Start() {
+  const { basis } = await standort();
+  const werke = await ladeWerke(kabinettIds());
+  const exponate: Exponat[] = KABINETT.map((b) => ({
+    frage: b.frage,
+    motive: b.motive,
+    gross: b.gross,
+    werk: [b.metId, ...(b.ersatz ?? [])].map((id) => werke.get(id)).find(Boolean),
+  }));
 
   return (
     <main className={cormorant.variable}>
-      <MonadenRaum standalone={standalone} serif={cormorant.style.fontFamily} kunst={kunst} />
+      <Kabinett exponate={exponate} lehrgang={`${basis}/lehrgang`} />
     </main>
   );
 }

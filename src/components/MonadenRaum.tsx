@@ -1259,7 +1259,18 @@ export default function MonadenRaum({
 
       {/* Kopf */}
       <header className="absolute left-5 top-5 flex items-baseline gap-4 sm:left-8 sm:top-7">
-        <h1 className="text-[15px] tracking-[0.22em] text-[#5c564d]">pli · trace · réseau · monade</h1>
+        <Link
+          href={standalone ? "/" : "/pli-trace-reseau-monade"}
+          className="text-[15px] tracking-[0.22em] text-[#5c564d] transition-colors hover:text-[#1f1c19]"
+        >
+          pli · trace · réseau · monade
+        </Link>
+        <Link
+          href={standalone ? "/lehrgang" : "/pli-trace-reseau-monade/lehrgang"}
+          className="hidden font-sans text-[10px] uppercase tracking-[0.18em] text-[#857d71] transition-colors hover:text-[#1f1c19] sm:inline"
+        >
+          Lehrgang
+        </Link>
         {station === null && (
           <button
             onClick={() => geheZu(0)}
