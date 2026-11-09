@@ -1,7 +1,7 @@
 import { getImageProps } from "next/image";
 
 /**
- * Hintergrundbilder: gemeinfreie Werke aus der Open-Access-Sammlung des
+ * Bilder: gemeinfreie Werke aus der Open-Access-Sammlung des
  * Metropolitan Museum of Art, New York.
  *
  * Das Met stellt Bilder gemeinfreier Werke unter Creative Commons Zero (CC0)
@@ -21,6 +21,7 @@ export interface KunstEintrag {
   bezug: string;
 }
 
+/** Hintergrundbilder im Monaden-Raum */
 export const KUNST: KunstEintrag[] = [
   {
     monade: "welt",
@@ -74,6 +75,20 @@ export const KUNST: KunstEintrag[] = [
   },
 ];
 
+/** Bilder im Lehrgang (Kapitelseiten), mit Begründung für das Impressum */
+export const LEHRGANG_BILDER: { metId: number; bezug: string }[] = [
+  { metId: 437394, bezug: "Kapitel 1: Der Philosoph zwischen dem alten Dichter und dem mächtigen Schüler." },
+  { metId: 437397, bezug: "Kapitel 1: Das Ich, das sich selbst anschaut, mit allem, was ihm zugestossen ist." },
+  { metId: 416025, bezug: "Kapitel 2: Der Dreissigjährige Krieg, in dessen letzten Jahren Leibniz geboren wird." },
+  { metId: 207816, bezug: "Kapitel 2: Der Himmel als Kugel auf dem Tisch — die neue Wissenschaft." },
+  { metId: 193624, bezug: "Kapitel 2: Die Welt als Uhrwerk, das Lieblingsbild der Zeit." },
+  { metId: 399922, bezug: "Kapitel 2: Das Kleine wird zur Welt — Merian, Leibniz' Zeitgenossin." },
+  { metId: 364922, bezug: "Kapitel 2: Versailles, eine Welt, die von einem Punkt aus geordnet ist." },
+  { metId: 435904, bezug: "Kapitel 2: Vanitas — hinter aller Ordnung die Vergänglichkeit." },
+  { metId: 437881, bezug: "Kapitel 3: Das Fenster, das die Monade nicht hat." },
+  { metId: 435888, bezug: "Kapitel 3: Die Monade als Blase — ein Vorgriff auf Sloterdijk." },
+];
+
 export interface Kunstwerk {
   monade: string;
   metId: number;
@@ -83,7 +98,9 @@ export interface Kunstwerk {
   datum: string;
   credit: string;
   url: string;
-  /** Über die eigene Domain optimierte Bildquelle */
+  /** Originalbild beim Museum (für next/image) */
+  quelle: string;
+  /** Über die eigene Domain optimierte Bildquelle (für Canvas) */
   src: string;
 }
 
@@ -119,6 +136,7 @@ async function ladeEintrag(e: KunstEintrag): Promise<Kunstwerk | null> {
       datum: o.objectDate,
       credit: o.creditLine,
       url: o.objectURL || `https://www.metmuseum.org/art/collection/search/${e.metId}`,
+      quelle,
       src: props.src,
     };
   } catch {
@@ -126,8 +144,19 @@ async function ladeEintrag(e: KunstEintrag): Promise<Kunstwerk | null> {
   }
 }
 
-/** Alle geprüften, gemeinfreien Werke (fehlende werden still weggelassen) */
+/** Alle geprüften, gemeinfreien Werke des Raums (fehlende werden still weggelassen) */
 export async function ladeKunst(): Promise<Kunstwerk[]> {
   const alle = await Promise.all(KUNST.map(ladeEintrag));
   return alle.filter((k): k is Kunstwerk => k !== null);
+}
+
+/** Werke nach Met-Nummer, als Map (fehlende bleiben weg) */
+export async function ladeWerke(ids: number[]): Promise<Map<number, Kunstwerk>> {
+  const eindeutig = [...new Set(ids)];
+  const alle = await Promise.all(eindeutig.map((metId) => ladeEintrag({ monade: "", metId, bezug: "" })));
+  const out = new Map<number, Kunstwerk>();
+  alle.forEach((k) => {
+    if (k) out.set(k.metId, k);
+  });
+  return out;
 }
