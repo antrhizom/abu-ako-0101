@@ -75,20 +75,6 @@ export const KUNST: KunstEintrag[] = [
   },
 ];
 
-/** Bilder im Lehrgang (Kapitelseiten), mit Begründung für das Impressum */
-export const LEHRGANG_BILDER: { metId: number; bezug: string }[] = [
-  { metId: 437394, bezug: "Kapitel 1: Der Philosoph zwischen dem alten Dichter und dem mächtigen Schüler." },
-  { metId: 437397, bezug: "Kapitel 1: Das Ich, das sich selbst anschaut, mit allem, was ihm zugestossen ist." },
-  { metId: 416025, bezug: "Kapitel 2: Der Dreissigjährige Krieg, in dessen letzten Jahren Leibniz geboren wird." },
-  { metId: 207816, bezug: "Kapitel 2: Der Himmel als Kugel auf dem Tisch — die neue Wissenschaft." },
-  { metId: 193624, bezug: "Kapitel 2: Die Welt als Uhrwerk, das Lieblingsbild der Zeit." },
-  { metId: 399922, bezug: "Kapitel 2: Das Kleine wird zur Welt — Merian, Leibniz' Zeitgenossin." },
-  { metId: 364922, bezug: "Kapitel 2: Versailles, eine Welt, die von einem Punkt aus geordnet ist." },
-  { metId: 435904, bezug: "Kapitel 2: Vanitas — hinter aller Ordnung die Vergänglichkeit." },
-  { metId: 437881, bezug: "Kapitel 3: Das Fenster, das die Monade nicht hat." },
-  { metId: 435888, bezug: "Kapitel 3: Die Monade als Blase — ein Vorgriff auf Sloterdijk." },
-];
-
 export interface Kunstwerk {
   monade: string;
   metId: number;

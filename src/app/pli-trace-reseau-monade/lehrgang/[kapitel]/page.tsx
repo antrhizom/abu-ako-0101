@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { KAPITEL, kapitelNachSlug, bilderVon, type Block } from "@/lib/lehrgang";
+import { KAPITEL, kapitelNachSlug, bilderVon, kandidaten, type Block } from "@/lib/lehrgang";
 import { ladeWerke, type Kunstwerk } from "@/lib/kunst";
 import { cormorant } from "../../schrift";
 import { standort } from "../../standort";
@@ -65,7 +65,7 @@ function BlockAnsicht({ b, werke }: { b: Block; werke: Map<number, Kunstwerk> })
     case "absatz":
       return <p className="mt-4 text-[1.08rem] leading-[1.65] text-[#3a352f]">{b.text}</p>;
     case "bild":
-      return <Bild k={werke.get(b.metId)} warum={b.warum} />;
+      return <Bild k={kandidaten(b).map((id) => werke.get(id)).find(Boolean)} warum={b.warum} />;
     case "merksatz":
       return (
         <p className="my-7 border-l-2 border-[#2b2723]/40 pl-4 text-[1.3rem] font-light leading-[1.4] text-[#1f1c19]">

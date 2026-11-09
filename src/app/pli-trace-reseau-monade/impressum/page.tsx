@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { KUNST, LEHRGANG_BILDER, ladeWerke, type Kunstwerk } from "@/lib/kunst";
+import { KUNST, ladeWerke, type Kunstwerk } from "@/lib/kunst";
+import { KAPITEL, bildBloecke, kandidaten } from "@/lib/lehrgang";
 import { cormorant } from "../schrift";
 import { standort } from "../standort";
 
@@ -67,7 +68,15 @@ function Nachweis({ metId, bezug, k }: { metId: number; bezug: string; k: Kunstw
 
 export default async function Impressum() {
   const { basis } = await standort();
-  const werke = await ladeWerke([...KUNST.map((e) => e.metId), ...LEHRGANG_BILDER.map((e) => e.metId)]);
+  const bloecke = bildBloecke();
+  const werke = await ladeWerke([...KUNST.map((e) => e.metId), ...bloecke.flatMap(kandidaten)]);
+  // Pro Bild-Block das Werk, das tatsächlich gezeigt wird, mit Kapitelangabe
+  const lehrgang = KAPITEL.flatMap((k) =>
+    bildBloecke([k]).map((b) => {
+      const id = kandidaten(b).find((c) => werke.has(c)) ?? b.metId;
+      return { metId: id, bezug: `Kapitel ${k.nummer}: ${b.warum}`, k: werke.get(id) };
+    })
+  );
 
   return (
     <main
@@ -122,8 +131,8 @@ export default async function Impressum() {
           </p>
           <h3 className="pt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Im Lehrgang</h3>
           <ul className="space-y-4">
-            {LEHRGANG_BILDER.map((e) => (
-              <Nachweis key={e.metId} metId={e.metId} bezug={e.bezug} k={werke.get(e.metId)} />
+            {lehrgang.map((e) => (
+              <Nachweis key={e.metId} metId={e.metId} bezug={e.bezug} k={e.k} />
             ))}
           </ul>
           <h3 className="pt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">

@@ -9,7 +9,7 @@
 
 export type Block =
   | { art: "absatz"; text: string }
-  | { art: "bild"; metId: number; warum: string }
+  | { art: "bild"; metId: number; warum: string; ersatz?: number[] }
   | { art: "merksatz"; text: string }
   | { art: "begriff"; wort: string; text: string }
   | { art: "beispiel"; situation: string; anders: string }
@@ -189,6 +189,7 @@ export const KAPITEL: Kapitel[] = [
           {
             art: "bild",
             metId: 416025,
+            ersatz: [420826, 420819],
             warum:
               "Jacques Callot, Die Hinrichtung (La Pendaison), 1633, aus der Folge «Die Elenden und Unglücke des Krieges». Callot zeigt den Krieg nicht als Heldentat, sondern als das, was er mit Menschen macht. In dieser Welt wächst Leibniz auf.",
           },
@@ -500,8 +501,21 @@ export function kapitelNachSlug(slug: string): Kapitel | undefined {
   return KAPITEL.find((k) => k.slug === slug);
 }
 
+export type BildBlock = Extract<Block, { art: "bild" }>;
+
+/** Alle Bild-Blöcke eines Kapitels (oder aller Kapitel) */
+export function bildBloecke(kapitel: Kapitel[] = KAPITEL): BildBlock[] {
+  const out: BildBlock[] = [];
+  for (const k of kapitel) for (const a of k.abschnitte) for (const b of a.bloecke) if (b.art === "bild") out.push(b);
+  return out;
+}
+
+/** Kandidaten eines Bild-Blocks: das Werk, dann die Ersatzabzüge */
+export function kandidaten(b: BildBlock): number[] {
+  return [b.metId, ...(b.ersatz ?? [])];
+}
+
+/** Alle Met-Nummern, die ein Kapitel laden muss */
 export function bilderVon(k: Kapitel): number[] {
-  const ids: number[] = [];
-  for (const a of k.abschnitte) for (const b of a.bloecke) if (b.art === "bild") ids.push(b.metId);
-  return ids;
+  return bildBloecke([k]).flatMap(kandidaten);
 }
