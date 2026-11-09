@@ -37,6 +37,11 @@ export const KABINETT: KabinettBild[] = [
   { metId: 435904, frage: "Was bleibt?", motive: ["Zeit", "Spur"] },
   { metId: 435809, frage: "Wer arbeitet hier alles mit?", motive: ["Verbindung", "Zeit", "Perspektive"], gross: true },
   { metId: 362671, frage: "Wer hat das gebaut, und wofür?", motive: ["Unübersicht", "Ordnung"] },
+  { metId: 393576, ersatz: [393007], frage: "Was siehst du erst im Spiegel?", motive: ["Perspektive", "Wahrheit"] },
+  { metId: 341372, ersatz: [377854], frage: "Wo hört die Bühne auf?", motive: ["Ordnung", "Perspektive", "Unübersicht"], gross: true },
+  { metId: 888078, frage: "Woher kommt das Perlmutt?", motive: ["Verbindung", "Himmel"] },
+  { metId: 699672, ersatz: [387871], frage: "Wie oft siehst du dich?", motive: ["Kugel", "Ich", "Mitte"] },
+  { metId: 206399, frage: "Wie faltet sich Stein?", motive: ["Falte", "Innen"] },
 ];
 
 export function kabinettIds(): number[] {
