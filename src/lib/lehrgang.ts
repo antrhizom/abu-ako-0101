@@ -150,7 +150,7 @@ export const KAPITEL: Kapitel[] = [
           },
           {
             art: "absatz",
-            text: "Leibniz ist mit diesem Versuch gescheitert, aber auf eine Weise, die alle Späteren weitergedacht haben. Darum beginnen wir bei ihm. Zuerst mit der Welt, in der er lebte (Kapitel 2), denn ohne diese Welt versteht man nicht, warum er die Monade brauchte. Dann mit dem Begriff selbst, Schritt für Schritt (Kapitel 3). Erst danach kommen die Antworten der anderen (Teil II).",
+            text: "Leibniz ist mit diesem Versuch gescheitert, aber auf eine Weise, die alle Späteren weitergedacht haben. Darum beginnen wir bei ihm. Zuerst mit der Welt, in der er lebte (Kapitel 2), denn ohne diese Welt versteht man nicht, warum er die Monade brauchte. Dann mit dem Begriff selbst, Schritt für Schritt (Kapitel 3). Kapitel 4 fragt dann, warum ausgerechnet dieses alte Bild unsere Zeit trifft: Gilles Deleuze hat die Monade im Barock wiedergefunden, und der Barock sieht unserer Gegenwart ähnlicher, als man denkt. Erst danach kommen die Antworten der anderen (Teil II).",
           },
           {
             art: "frage",
@@ -490,6 +490,240 @@ export const KAPITEL: Kapitel[] = [
           {
             art: "frage",
             text: "Gibt es in deinem Leben einen «Uhrmacher», auf den du dich verlässt, dass am Ende alles zusammenpasst?",
+          },
+        ],
+      },
+    ],
+  },
+  /* ================================================================ */
+  {
+    slug: "warum-die-monade",
+    nummer: 4,
+    titel: "Warum die Monade?",
+    untertitel: "Barock, Neo-Barock und unsere Zeit",
+    minuten: 14,
+    worum: [
+      "Fünf Gründe, warum dieser Lehrgang bei einem Bild beginnt, das gescheitert ist.",
+      "Wie Gilles Deleuze die Monade im Barock wiederfindet: die Falte, das Haus mit zwei Stockwerken, die Bühne.",
+      "Die These, dass der Barock unserer Zeit näher ist als die Moderne dazwischen, und was an ihr stimmt und was nicht.",
+    ],
+    abschnitte: [
+      {
+        titel: "Fünf Gründe",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "Man könnte einwenden: Warum bei Leibniz beginnen, wenn sein System nicht funktioniert? Weil die Monade nicht trotz ihres Scheiterns der richtige Anfang ist, sondern wegen ihm. Fünf Gründe.",
+          },
+          {
+            art: "liste",
+            punkte: [
+              "Die Monade ist die erste Philosophie ohne Mitte. Nach Kopernikus gibt es keinen bevorzugten Ort mehr, von dem aus die Welt gesehen wird. Leibniz macht daraus ein Prinzip: Jeder Standpunkt ist ein Zentrum, und darum ist es keiner.",
+              "Die Monade ist kein Ich. Sie gestaltet die Welt nicht von aussen, sie ist ein Ort, an dem die Welt sich spiegelt und faltet. Das ist das zweite Bild aus Kapitel 1, dreihundert Jahre vor Latour.",
+              "Sie ist in einer Krise entstanden, die uns bekannt vorkommt: Streit um die Wahrheit, Verlust der Mitte, Instrumente, die Unendlichkeiten zeigen, Ordnungen, die alles auf einen Punkt richten wollen (Kapitel 2).",
+              "Sie ist produktiv gescheitert. Der Uhrmacher ist weg, die Frage bleibt. Jede Antwort in Teil II füllt dieselbe Lücke: mit Falten, Spuren, Fenstern oder geteilten Wänden. Die Monade macht die Antworten vergleichbar.",
+              "Sie ist anschaulich. Die Stadt von verschiedenen Seiten, die Blase ohne Fenster, die Uhren: Bilder, die man aus dem Alltag kennt.",
+            ],
+          },
+          {
+            art: "merksatz",
+            text: "Die Monade ist das Scharnier: der letzte Versuch, eine Welt ohne Mitte als eine zu denken, und der erste Begriff für eine Welt, die aus Standpunkten besteht.",
+          },
+        ],
+      },
+      {
+        titel: "Deleuze findet die Monade im Barock",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "1988 erscheint «Die Falte. Leibniz und der Barock» von Gilles Deleuze. Deleuze liest Leibniz nicht als Logiker, sondern als Philosophen einer Epoche, und die Epoche nicht als Stil, sondern als Tätigkeit: Der Barock ist für ihn keine Essenz, sondern eine Operation. Er produziert unablässig Falten, bis ins Unendliche. Ein Vorhang, eine Wolke, ein Kleid, Marmor, der wie Stoff fällt: Überall wird eine Fläche so gebogen, dass sie ein Innen bekommt, ohne dass ein Fenster nötig wäre.",
+          },
+          {
+            art: "bild",
+            metId: 206399,
+            warum:
+              "Gian Lorenzo Bernini, mit seinem Vater Pietro: Bacchanal, ein von Kindern geneckter Faun, um 1616/17. Bernini ist etwa achtzehn. Der Marmor tut, was Marmor nicht kann: Er faltet sich, windet sich, hat Innen und Aussen. Deleuzes Beispiele für die Falte stammen aus dieser Kunst, unter anderem Berninis Verzückung der heiligen Theresa, bei der die Figur fast ganz in Faltung aufgeht.",
+          },
+          {
+            art: "begriff",
+            wort: "Die Falte",
+            text: "Deleuzes Grundbegriff für Leibniz und den Barock: Das Innen entsteht, indem das Aussen eingefaltet wird. Eine gefaltete Fläche braucht kein Fenster, um ein Inneres zu haben. Die Monade ist eine solche Falte.",
+          },
+          {
+            art: "absatz",
+            text: "Deleuzes zweites Bild ist das barocke Haus mit zwei Stockwerken. Unten die Materie mit ihren Falten und mit Fenstern: die Sinne, der Körper. Oben eine Kammer ohne Fenster, deren Wände mit Falten bespannt sind: die Seele, die Monade. Was unten geschieht, lässt oben die Falten schwingen, ohne dass etwas hindurchgeht. So löst Deleuze, was bei Leibniz ein Rätsel blieb: Wie kann etwas ohne Fenster die ganze Welt enthalten? Indem es gefaltet ist.",
+          },
+          {
+            art: "absatz",
+            text: "Und er sieht den Barock nicht nur um 1650. Er findet die Falte bei Mallarmé und in Boulez' Musik, in den gefalteten Leinwänden von Simon Hantaï, in moderner Architektur. Der Barock ist für ihn eine Möglichkeit, die wiederkehrt, immer dann, wenn eine Welt ihre Mitte verliert und trotzdem zusammenhalten soll.",
+          },
+        ],
+      },
+      {
+        titel: "Was der Barock spürt: Das Sehen wird unsicher",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "Warum gerade der Barock? Weil er die Krise, die Kapitel 2 beschrieben hat, nicht nur erlebt, sondern ausstellt. Die Kunst dieser Zeit spielt unablässig mit dem, was man sieht und was man zu sehen glaubt. Drei Beispiele.",
+          },
+          {
+            art: "bild",
+            metId: 393576,
+            ersatz: [393007],
+            warum:
+              "Hans Troschel nach Simon Vouet, Satyrn bewundern die Anamorphose eines Elefanten, Titelblatt zu Nicerons «La Perspective curieuse», 1652. Auf dem Boden ein verzerrtes, unlesbares Gebilde; erst im zylindrischen Spiegel wird ein Elefant daraus. Die Anamorphose ist das barocke Bild schlechthin: Was man sieht, hängt davon ab, wo man steht und welches Instrument man benutzt.",
+          },
+          {
+            art: "bild",
+            metId: 838177,
+            ersatz: [436347],
+            warum:
+              "Unbekannter Maler, Trompe-l'œil einer Radierung von Ferdinand Bol, um 1675. Ein gemaltes Blatt, mit gemaltem Siegelwachs auf ein gemaltes Brett geheftet, das sich scheinbar dem Betrachter entgegenrollt. Das Bild zeigt nichts als die Täuschung selbst und die Frage, was dann noch «echt» heisst.",
+          },
+          {
+            art: "bild",
+            metId: 341372,
+            ersatz: [377854],
+            warum:
+              "Umkreis des Ferdinando Galli Bibiena, Bühnenentwurf mit Hof und Triumphbogen, um 1700. Die Bibiena bauen für die Höfe Europas Bühnen, die tiefer wirken als das Theater, in dem sie stehen. Theatrum mundi: Die Welt ist eine Bühne, und hinter der Kulisse steht die nächste Kulisse.",
+          },
+          {
+            art: "begriff",
+            wort: "Theatrum mundi",
+            text: "Die Welt als Theater: ein Lieblingsgedanke des Barock, von Shakespeare («All the world's a stage») bis Calderón («Das Leben ein Traum», 1635). Jeder spielt eine Rolle, niemand hat sie sich ausgesucht, und ob hinter der Bühne etwas ist, bleibt offen.",
+          },
+          {
+            art: "absatz",
+            text: "Die Philosophin Christine Buci-Glucksmann hat das «die Verrücktheit des Sehens» genannt: Der barocke Blick weiss, dass er nie das Ganze sieht, nur Ausschnitte, Spiegelungen, Perspektiven. Das ist genau Leibniz' Monade, in Kunst übersetzt: dieselbe Welt, von jedem Ort aus anders, und von keinem Ort aus ganz.",
+          },
+        ],
+      },
+      {
+        titel: "War der Barock schon postmodern?",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "Die Frage klingt gewagt, ist aber ernst gemeint worden. Walter Benjamin fand 1928 im barocken Trauerspiel die Allegorie und die Ruine: eine Welt, in der die Dinge nicht mehr von selbst bedeuten, sondern Bedeutung ihnen zugeschrieben wird, mit Melancholie. 1980 definierte der Kunstkritiker Craig Owens die postmoderne Kunst genau über diese barocke Allegorie: Zitat, Collage, Aneignung. Der Semiotiker Omar Calabrese nannte unsere Zeit 1987 «das neobarocke Zeitalter»: Lust an Wiederholung mit kleinen Variationen, an Überfluss, Fragment und Virtuosität, von der Fernsehserie bis zur Wissenschaft.",
+          },
+          {
+            art: "liste",
+            punkte: [
+              "Verlust der Mitte und Vervielfachung der Perspektiven: damals Anamorphose und Trompe-l'œil, heute Bilder, denen man nicht traut.",
+              "Theatrum mundi: damals der Hofmann mit seiner Rolle, heute das Profil, das man pflegt.",
+              "Allegorie und Fragment: damals Ruine und Sinnbild, heute Zitat, Remix, Meme.",
+              "Erste Medienkultur: damals Druckgrafik in Serie, Jesuitentheater, Kirchen als Gesamtspektakel; heute Serien, Franchises, Dauerreiz.",
+              "Erster globaler Stil: Barock in Lima, Goa, Manila, Peking; heute die Mischformen der Globalisierung.",
+              "Unendlichkeiten: damals Infinitesimalrechnung und Mikroskop, heute Datenmengen, die niemand überblickt.",
+              "Das Selbst als Rolle: Gracián schreibt 1647 ein Handbuch der Verstellung, Montaigne nennt den Menschen «wogend und vielfältig»; heute die Frage, wer man ohne seine Auftritte ist.",
+            ],
+          },
+          {
+            art: "absatz",
+            text: "Und doch stimmt die Gleichung nicht ganz. Erstens liegt der Barock vor der Aufklärung; «postmodern» setzt die Moderne voraus. Zweitens war die barocke Antwort das Gegenteil der postmodernen: Versailles, Gegenreformation, Leibniz' Harmonie sind grosse Ordnungen, grosse Erzählungen. Jean-François Lyotard hat die Postmoderne 1979 gerade als Unglauben gegenüber den grossen Erzählungen bestimmt. Deleuze trennt darum selbst: Der Barock rettet die Harmonie noch, der Neo-Barock lässt die Dissonanz stehen.",
+          },
+          {
+            art: "absatz",
+            text: "Lyotard selbst liefert aber den Ausweg. Das Postmoderne, schreibt er sinngemäss, sei nicht das Ende des Modernen, sondern das Moderne im Zustand seines Entstehens, und dieser Zustand sei beständig. Dann ist der Barock die Moderne im Entstehen: der Moment, in dem die Krise schon da ist und die Antwort noch nicht erstarrt.",
+          },
+          {
+            art: "merksatz",
+            text: "Der Barock ist postmodern in seiner Lage und vormodern in seiner Lösung. Er spürt die Welt ohne Mitte und antwortet mit dem grössten Versuch einer Gesamtordnung, den es je gab.",
+          },
+          {
+            art: "begriff",
+            wort: "Postmoderne",
+            text: "Sammelname für Denkweisen seit etwa 1970, die der Moderne nicht mehr trauen: keinem Fortschritt, der alle mitnimmt, keiner Vernunft, die für alle spricht, keiner grossen Erzählung. Dafür Vielheit, Perspektiven, Zitate. Der Name ist umstritten; viele der hier versammelten Denker haben ihn für sich abgelehnt.",
+          },
+        ],
+      },
+      {
+        titel: "Neo-Barock: das Unvereinbare in derselben Welt",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "Deleuzes Wort für unsere Zeit ist Neo-Barock. Der Unterschied zu Leibniz liegt in einem einzigen Punkt. Leibniz verteilt alles, was sich widerspricht, auf getrennte mögliche Welten; Gott wählt die beste, und in ihr passt alles zusammen. Im Neo-Barock gibt es diese Verteilung nicht mehr: Das Unvereinbare lebt in derselben Welt.",
+          },
+          {
+            art: "absatz",
+            text: "Deleuzes Beispiel ist eine Erzählung von Jorge Luis Borges, «Der Garten der Pfade, die sich verzweigen» (1941). Darin gibt es ein Buch, in dem alle möglichen Fortsetzungen einer Geschichte gleichzeitig wahr sind: Der Held stirbt, der Held überlebt, der Held wird zum Verräter, alles zugleich. Leibniz hätte das nie zugelassen. Borges tut es, und Deleuze sagt: So ist unsere Welt. Nicht ein Kosmos, sondern ein «Chaosmos». Die Harmonie wird nicht abgeschafft, aber sie hat keinen Uhrmacher mehr; sie muss aus den Dissonanzen selbst entstehen.",
+          },
+          {
+            art: "bild",
+            metId: 344561,
+            ersatz: [387871],
+            warum:
+              "Sébastien Leclerc, Labyrinte de Versailles, 1677, mit Versen von Isaac de Benserade und einem Text von Charles Perrault. Das Labyrinth im Garten des Sonnenkönigs: ein geordneter Irrgarten mit 39 Brunnen nach Äsops Fabeln. Der Barock baut das Labyrinth, Borges lässt es sich verzweigen.",
+          },
+          {
+            art: "bild",
+            metId: 888078,
+            warum:
+              "Miguel González zugeschrieben, Anbetung der Könige, Mexiko-Stadt, um 1695–1700. Öl auf Holz, eingelegt mit Perlmutt und Gold: eine Technik, die Werkstätten in Mexiko aus asiatischen Lackarbeiten entwickelten, für ein europäisches Bildthema. Der Barock ist der erste Stil, der um die ganze Erde geht und sich dabei überall verwandelt. Der kubanische Schriftsteller Severo Sarduy nannte das 1974 den «Neobarroco» Lateinamerikas.",
+          },
+          {
+            art: "absatz",
+            text: "Bruno Latour würde hier einwenden: Die Moderne hat behauptet, Natur und Gesellschaft, Fakten und Werte sauber zu trennen, und hat dabei immer Mischwesen produziert. «Wir sind nie modern gewesen», heisst sein Buch von 1991. Von da aus gesehen ist der Barock die Zeit vor der grossen Säuberung, in der die Mischungen noch sichtbar waren, und der Neo-Barock die Zeit, in der sie es wieder sind.",
+          },
+        ],
+      },
+      {
+        titel: "Die letzte Kugel",
+        bloecke: [
+          {
+            art: "absatz",
+            text: "Peter Sloterdijk erzählt in «Globen» (1999), dem zweiten Band seiner Sphären-Trilogie, die Geschichte der einen grossen Kugel: des Kosmos, der alles umschliesst, von den Griechen über das Christentum bis zu den Globen auf den Tischen der Fürsten. Das Kapitel zur Globalisierung durch Schiffe, Karten und Kapital heisst «Die letzte Kugel». Der Barock mit seinen Himmelsgloben, Spiegelsälen und Sonnenkönigen ist der Moment, in dem die Kugel am prächtigsten ist, kurz bevor sie zerbricht. Was danach kommt, nennt Sloterdijk Schäume: viele kleine Blasen, die Wände teilen. Ob er den Barock selbst so beschreibt, konnte ich nicht prüfen; die Lesart ist meine.",
+          },
+          {
+            art: "bild",
+            metId: 699672,
+            ersatz: [387871],
+            warum:
+              "Sébastien Leclerc, Blick in die Spiegelgalerie von Versailles, 1684. Siebzehn Fenster, siebzehn Spiegel: Der Saal verdoppelt den Garten und den Himmel und stellt den König in die Mitte von allem. Die letzte Kugel, aus Glas.",
+          },
+          {
+            art: "merksatz",
+            text: "Leibniz' Harmonie, Versailles' Spiegelsaal und die Kugel auf dem Tisch sind dasselbe Bild: eine Welt, die von einem Punkt aus ganz ist. Wir leben in dem, was davon übrig ist, und das ist nicht nichts.",
+          },
+        ],
+      },
+      {
+        titel: "Im Leben",
+        bloecke: [
+          {
+            art: "beispiel",
+            situation: "Dein Profil ist eine Bühne. Du weisst es, und es ist dir manchmal peinlich.",
+            anders:
+              "Der Barock wusste das auch; Gracián schrieb 1647 ein Handbuch dafür. Nicht die Bühne ist das Problem, sondern der Glaube, dahinter sei nichts, oder alles. Frag: Für wen spiele ich, wer spielt mit mir, und wo brauche ich keine Bühne?",
+          },
+          {
+            art: "beispiel",
+            situation: "Du schaust die zwölfte Staffel, obwohl du längst weisst, wie es geht.",
+            anders:
+              "Das ist Neo-Barock: Lust an der Wiederholung mit kleiner Variation (Calabrese). Kein Grund zur Scham, aber ein Grund, es zu bemerken: Wo suche ich Wiederholung, und wo suche ich etwas, das ich noch nicht kenne?",
+          },
+          {
+            art: "beispiel",
+            situation: "Zwei Freunde streiten über ein Thema; jeder hat seine Quellen, jeder lebt in «seiner Welt».",
+            anders:
+              "Leibniz hätte die beiden auf zwei mögliche Welten verteilt. Im Neo-Barock leben beide in derselben. Die Frage ist darum nicht, wer die wahre Welt hat, sondern wie zwei unvereinbare Sichten in einer Welt nebeneinander bestehen können, ohne dass eine die andere auslöscht.",
+          },
+          {
+            art: "beispiel",
+            situation: "Eine Nachricht ergibt nur Sinn, wenn man sie von einem bestimmten Punkt aus liest; von einem anderen wirkt sie verzerrt.",
+            anders:
+              "Das ist eine Anamorphose. Frag nicht nur, was sie zeigt, sondern wo man stehen muss, damit sie etwas zeigt, und wer dich dorthin gestellt hat.",
+          },
+          {
+            art: "frage",
+            text: "Wo in deinem Alltag ist etwas barock: übervoll, inszeniert, gefaltet, ohne Mitte? Und stört dich das, oder trägt es dich?",
+          },
+          {
+            art: "frage",
+            text: "Leibniz baut die letzte Kugel, Borges lässt den Garten sich verzweigen. Welches Bild beschreibt deine Woche besser?",
+          },
+          {
+            art: "absatz",
+            text: "Damit ist der Anfang gemacht. Die Monade steht, ihre Welt steht, und ihr Scheitern ist verstanden. Was jetzt kommt, sind die Antworten: Wie lebt man in der Welt ohne Uhrmacher? Deleuze sagt: falten. Derrida: Spuren lesen. Latour: verbinden. Sloterdijk: Wände teilen. Teil II.",
           },
         ],
       },
