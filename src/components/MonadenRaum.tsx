@@ -1266,7 +1266,7 @@ export default function MonadenRaum({
           pli · trace · réseau · monade
         </Link>
         <Link
-          href={standalone ? "/" : "/pli-trace-reseau-monade"}
+          href={standalone ? "/lehrgang" : "/pli-trace-reseau-monade/lehrgang"}
           className="hidden font-sans text-[10px] uppercase tracking-[0.18em] text-[#857d71] transition-colors hover:text-[#1f1c19] sm:inline"
         >
           Lehrgang

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { KUNST, ladeWerke, type Kunstwerk } from "@/lib/kunst";
 import { KAPITEL, bildBloecke, kandidaten } from "@/lib/lehrgang";
+import { KABINETT, kabinettIds } from "@/lib/kabinett";
 import { cormorant } from "../schrift";
 import { standort } from "../standort";
 
@@ -69,7 +70,11 @@ function Nachweis({ metId, bezug, k }: { metId: number; bezug: string; k: Kunstw
 export default async function Impressum() {
   const { basis } = await standort();
   const bloecke = bildBloecke();
-  const werke = await ladeWerke([...KUNST.map((e) => e.metId), ...bloecke.flatMap(kandidaten)]);
+  const werke = await ladeWerke([...KUNST.map((e) => e.metId), ...bloecke.flatMap(kandidaten), ...kabinettIds()]);
+  const kabinett = KABINETT.map((b) => {
+    const id = [b.metId, ...(b.ersatz ?? [])].find((c) => werke.has(c)) ?? b.metId;
+    return { metId: id, bezug: `Startseite, Frage: «${b.frage}»`, k: werke.get(id) };
+  });
   // Pro Bild-Block das Werk, das tatsächlich gezeigt wird, mit Kapitelangabe
   const lehrgang = KAPITEL.flatMap((k) =>
     bildBloecke([k]).map((b) => {
@@ -87,7 +92,7 @@ export default async function Impressum() {
           href={`${basis}/`}
           className="font-sans text-[10px] uppercase tracking-[0.22em] text-[#857d71] transition-colors hover:text-[#2b2723]"
         >
-          ← zum Lehrgang
+          ← zum Kabinett
         </Link>
 
         <h1 className="mt-10 text-[2.6rem] font-light leading-tight text-[#1f1c19]">Impressum</h1>
@@ -129,6 +134,12 @@ export default async function Impressum() {
             Beim Aufruf prüft die Seite über die offizielle Schnittstelle des Museums, ob ein Werk dort als gemeinfrei
             geführt wird. Nur dann wird es angezeigt.
           </p>
+          <h3 className="pt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Im Kabinett (Startseite)</h3>
+          <ul className="space-y-4">
+            {kabinett.map((e) => (
+              <Nachweis key={"k" + e.metId} metId={e.metId} bezug={e.bezug} k={e.k} />
+            ))}
+          </ul>
           <h3 className="pt-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#9a9286]">Im Lehrgang</h3>
           <ul className="space-y-4">
             {lehrgang.map((e) => (

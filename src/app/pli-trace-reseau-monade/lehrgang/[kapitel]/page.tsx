@@ -149,7 +149,7 @@ export default async function KapitelSeite({ params }: Props) {
     >
       <article className="mx-auto max-w-[40rem]">
         <nav className="flex items-baseline justify-between gap-4">
-          <Link href={`${basis}/`} className={`${KLEIN} transition-colors hover:text-[#1f1c19]`}>
+          <Link href={`${basis}/lehrgang`} className={`${KLEIN} transition-colors hover:text-[#1f1c19]`}>
             ← Lehrgang
           </Link>
           <span className={KLEIN}>
@@ -190,7 +190,7 @@ export default async function KapitelSeite({ params }: Props) {
               ← {vorher.nummer} · {vorher.titel}
             </Link>
           ) : (
-            <Link href={`${basis}/`} className={`${KLEIN} transition-colors hover:text-[#1f1c19]`}>
+            <Link href={`${basis}/lehrgang`} className={`${KLEIN} transition-colors hover:text-[#1f1c19]`}>
               ← Übersicht
             </Link>
           )}

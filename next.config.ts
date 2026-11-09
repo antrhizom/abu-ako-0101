@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         { source: "/", has: host, destination: ziel },
+        { source: "/lehrgang", has: host, destination: `${ziel}/lehrgang` },
         { source: "/lehrgang/:kapitel", has: host, destination: `${ziel}/lehrgang/:kapitel` },
         { source: "/raum", has: host, destination: `${ziel}/raum` },
         { source: "/impressum", has: host, destination: `${ziel}/impressum` },
